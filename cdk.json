@@ -1,5 +1,5 @@
 {
-  "app": "npx ts-node --prefer-ts-exts bin/library-catalogue.ts",
+  "app": "npx ts-node --prefer-ts-exts iac/bin/libraryCatalogue.ts",
   "watch": {
     "include": [
       "**"
