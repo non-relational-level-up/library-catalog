@@ -1,0 +1,9 @@
+~id, ~label, name:string
+g-1, Genre, "Fantasy"
+g-2, Genre, "Science Fiction"
+g-3, Genre, "Mystery"
+g-4, Genre, "Thriller"
+g-5, Genre, "Historical Fiction"
+g-6, Genre, "Action"
+g-7, Genre, "Romance"
+g-8, Genre, "Drama"

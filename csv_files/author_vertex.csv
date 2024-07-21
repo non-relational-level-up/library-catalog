@@ -1,0 +1,6 @@
+~id, ~label, fullName:string
+a-1, Author, "J.K. Rowling"
+a-2, Author, "George R.R. Martin"
+a-3, Author, "J.R.R. Tolkien"
+a-4, Author, "Agatha Christie"
+a-5, Author, "Isaac Asimov"

@@ -1,0 +1,6 @@
+~id, ~label, title:string, publicationYear:double
+b-1, Book, "Harry Potter and the Sorcerer's Stone", 1997
+b-2, Book, "A Game of Thrones", 1996
+b-3, Book, "The Hobbit", 1937
+b-4, Book, "Murder on the Orient Express", 1934
+b-5, Book, "Foundation", 1951

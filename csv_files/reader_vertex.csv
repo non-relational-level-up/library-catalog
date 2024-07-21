@@ -1,0 +1,6 @@
+~id, ~label, username:string
+r-1, Reader, "alice"
+r-2, Reader, "robert"
+r-3, Reader, "wandile"
+r-4, Reader, "elvis"
+r-5, Reader, "michael"

@@ -1,0 +1,6 @@
+~id, ~label, name:string
+s-1, Series, "Harry Potter"
+s-2, Series, "A Song of Ice and Fire"
+s-3, Series, "The Lord of the Rings"
+s-4, Series, "Hercule Poirot"
+s-5, Series, "Foundation"
