@@ -1,6 +1,21 @@
-~id, ~from, ~label, ~to
-rb-1, r-1, reads, b-1
-rb-2, r-2, reads, b-2
-rb-3, r-3, reads, b-3
-rb-4, r-4, reads, b-4
-rb-5, r-5, reads, b-5
+~id,~from,~label,~to
+rb-1,r-1,reads,b-1
+rb-2,r-1,reads,b-2
+rb-3,r-1,reads,b-6
+rb-4,r-1,reads,b-7
+rb-5,r-2,reads,b-3
+rb-6,r-2,reads,b-4
+rb-7,r-2,reads,b-8
+rb-8,r-2,reads,b-9
+rb-9,r-3,reads,b-5
+rb-10,r-3,reads,b-10
+rb-11,r-3,reads,b-1
+rb-12,r-3,reads,b-6
+rb-13,r-4,reads,b-2
+rb-14,r-4,reads,b-3
+rb-15,r-4,reads,b-7
+rb-16,r-4,reads,b-8
+rb-17,r-5,reads,b-4
+rb-18,r-5,reads,b-5
+rb-19,r-5,reads,b-9
+rb-20,r-5,reads,b-10

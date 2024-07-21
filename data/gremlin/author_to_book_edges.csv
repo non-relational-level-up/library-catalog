@@ -1,6 +1,11 @@
-~id, ~from, ~label, ~to, role:string
-aw-1, a-1, wrote, b-1, Author
-aw-2, a-2, wrote, b-2, Author
-aw-3, a-3, wrote, b-3, Author
-aw-4, a-4, wrote, b-4, Author
-aw-5, a-5, wrote, b-5, Author
+~id,~from,~label,~to
+aw-1,a-1,wrote,b-1
+aw-2,a-1,wrote,b-6
+aw-3,a-2,wrote,b-2
+aw-4,a-2,wrote,b-7
+aw-5,a-3,wrote,b-3
+aw-6,a-3,wrote,b-8
+aw-7,a-4,wrote,b-4
+aw-8,a-4,wrote,b-9
+aw-9,a-5,wrote,b-5
+aw-10,a-5,wrote,b-10
