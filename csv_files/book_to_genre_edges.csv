@@ -1,0 +1,6 @@
+~id, ~from, ~label, ~to
+bg-1, b-1, belongs-to, g-1
+bg-2, b-2, belongs-to, g-2
+bg-3, b-3, belongs-to, g-3
+bg-4, b-4, belongs-to, g-4
+bg-5, b-5, belongs-to, g-5

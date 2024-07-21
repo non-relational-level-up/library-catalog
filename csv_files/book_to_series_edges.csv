@@ -1,0 +1,6 @@
+~id, ~from, ~label, ~to
+bs-1, b-1, part-of, s-1
+bs-2, b-2, part-of, s-2
+bs-3, b-3, part-of, s-3
+bs-4, b-4, part-of, s-4
+bs-5, b-5, part-of, s-5

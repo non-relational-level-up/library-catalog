@@ -1,0 +1,6 @@
+~id, ~from, ~label, ~to
+rb-1, r-1, reads, b-1
+rb-2, r-2, reads, b-2
+rb-3, r-3, reads, b-3
+rb-4, r-4, reads, b-4
+rb-5, r-5, reads, b-5
