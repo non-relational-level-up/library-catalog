@@ -1,6 +1,6 @@
 ~id, ~label, ageGroup:string
-age-1, AgeGroup, Child
-age-2, AgeGroup, Teen
-age-3, AgeGroup, Adult
-age-4, AgeGroup, All Ages
+age-1, AgeGroup, "Child"
+age-2, AgeGroup, "Teen"
+age-3, AgeGroup, "Adult"
+age-4, AgeGroup, "All Ages"
  
