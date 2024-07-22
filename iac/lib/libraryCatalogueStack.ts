@@ -129,7 +129,7 @@ export class LibraryCatalogueStack extends cdk.Stack {
             vpc: vpc,
             instanceType: aws_ec2.InstanceType.of(InstanceClass.T3, InstanceSize.MICRO),
             machineImage: MachineImage.latestAmazonLinux2023(),
-            keyPair: KeyPair.fromKeyPairAttributes(this, 'ec2-key-pair', {keyPairName: 'ec2-key-pair', type: KeyPairType.RSA}),
+            keyPair: new KeyPair(this, 'ec2-key-pair', {keyPairName: 'ec2-key-pair', type: KeyPairType.RSA}),
             securityGroup: ec2Sg,
         });
 
