@@ -116,6 +116,8 @@ export class LibraryCatalogueStack extends cdk.Stack {
                 environment: lambdaEnv,
                 timeout: Duration.seconds(30),
                 functionName: id,
+                vpc: vpc,
+                allowPublicSubnet: true,
                 ...props
             });
 
