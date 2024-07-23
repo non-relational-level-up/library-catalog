@@ -25,15 +25,14 @@ export const handler: APIGatewayProxyHandler = async (event) => {
             .outE("has-read")
             .inV()
             .valueMap(true)
-            .by(statics.unfold())
-            .toList();
+            .by(statics.unfold());
 
         console.log("============================");
         //console.log(readBooks);
         //console.log("============================");
 
-        for (let i=0; i<readBooks.length; i++) {
-            console.log(JSON.stringify(readBooks.at(i)));
+        while (readBooks.hasNext()) {
+            console.log(JSON.stringify(readBooks.next()));
         }
         console.log("============================");
 
