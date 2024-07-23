@@ -162,6 +162,10 @@ export class LibraryCatalogueStack extends cdk.Stack {
             entry: path.join(lambdaAppDir, 'ageGroup.ts'),
         });
 
+        const suggestionLambda = createLambda('suggestions', {
+            entry: path.join(lambdaAppDir, 'suggestions.ts'),
+        });
+
         // API
         const api = new RestApi(this, `${appName}-api-gateway`, {
             deployOptions: {stageName: 'prod'},
@@ -177,6 +181,15 @@ export class LibraryCatalogueStack extends cdk.Stack {
         const apiResource = api.root.addResource('api');
         apiResource.addResource('hello').addMethod(HttpMethod.GET, new LambdaIntegration(helloLambda));
         apiResource.addResource('ageGroup').addMethod(HttpMethod.GET, new LambdaIntegration(ageGroupLambda));
+        apiResource.addResource('hello').addMethod(
+            HttpMethod.GET, 
+            new LambdaIntegration(helloLambda)
+        );
+
+        apiResource.addResource('suggestions').addMethod(
+            HttpMethod.GET, 
+            new LambdaIntegration(suggestionLambda)
+        );
 
     }
 }

@@ -151,6 +151,7 @@ web_modules/
 
 # Optional npm cache directory
 .npm
+*.pem
 
 # Optional eslint cache
 .eslintcache
