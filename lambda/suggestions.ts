@@ -30,7 +30,7 @@ export const handler: APIGatewayProxyHandler = async (event) => {
         console.log(readBooks);
         console.log("============================");
 
-        const suggestions = await graph.V(reader.value.id)
+        const suggestions = await graph.V(reader.value)
             .outE("has-read")
             .inV()
             .aggregate("s")
