@@ -159,7 +159,7 @@ export class LibraryCatalogueStack extends cdk.Stack {
         });
 
         const ageGroupLambda = createLambda('age-group-lambda', {
-            entry: path.join(lambdaAppDir, 'geGroup.ts'),
+            entry: path.join(lambdaAppDir, 'ageGroup.ts'),
         });
 
         // API
