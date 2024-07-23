@@ -15,19 +15,30 @@ export const handler: APIGatewayProxyHandler = async (event) => {
     }
 
     try {
-        const output = await graph.V().valueMap().by(statics.unfold()).toList();
+        const books = await graph.V()
+            .hasLabel("AgeGroup")
+            .has("ageGroup", ageGroup)
+            .in_("suitable-for")
+            .dedup()
+            .limit(3)
+            .valueMap(true)
+            .by(statics.unfold())
+            .toList();
+
+        console.log(`Books suitable for age group ${ageGroup}:`);
+        console.log(books);
+
         await driverConnection.close();
-        console.log(output);
         return {
             statusCode: 200,
-            body: JSON.stringify(output)
+            body: JSON.stringify(books),
         };
     } catch (e) {
         await driverConnection.close();
         console.log(e);
         return {
             statusCode: 500,
-            body: JSON.stringify(e)
+            body: JSON.stringify(e),
         };
     }
 };
