@@ -36,6 +36,7 @@ export const handler: APIGatewayProxyHandler = async (event) => {
             .outE("has-read")                                     // Find all books this reader has read
             .in_("has-read")                                     // Find other readers of these same books
             .outE("has-read")                                     // Find books read by these other readers
+            .inV()
             .valueMap(true)
             .by(statics.unfold())
             .toList();
