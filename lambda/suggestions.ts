@@ -36,11 +36,9 @@ export const handler: APIGatewayProxyHandler = async (event) => {
             .outE("has-read")                                     // Find all books this reader has read
             .in_("has-read")                                     // Find other readers of these same books
             .where(P.neq(readerId))                          // Exclude the original reader
-            .outE("has-read")                                     // Find books read by these other readers
-            .where(P.not(__.in_("has-read").hasId(readerId))) // Exclude books already read by the original reader
-            .dedup()                                             // Remove duplicates
-            .valueMap()                                          // Fetch properties of these recommended books
-            .toList();                                           // Collect the results into a list
+            .valueMap(true)
+            .by(statics.unfold())
+            .toList();
 
         console.log(suggestions);
 
