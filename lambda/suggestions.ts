@@ -32,32 +32,21 @@ export const handler: APIGatewayProxyHandler = async (event) => {
         console.log(readBooks);
         console.log("============================");
 
-        const allBooks = await graph.V(readerId)          // Start from a specific reader vertex
-            .outE("has-read")                                     // Find all books this reader has read
-            .in_("has-read")                                     // Find other readers of these same books
-            .outE("has-read")                                     // Find books read by these other readers
-            .inV()
+        // Suggest books based on similar readers' interests
+        const suggestedBooks = await graph.V(readerId)
+            .outE()                  // Books read by the current reader
+            .in_("has-read")                 // Other readers who read the same books
+            .outE()                 // Books read by these other readers
+            .dedup()                         // Remove duplicate books
+            .where(__.not(__.in_("has-read").hasId(readerId)))  // Exclude books already read by the current reader
             .valueMap(true)
             .by(statics.unfold())
             .toList();
-        
-        console.log("============================");
-        console.log(allBooks);
-        console.log("============================");
-    
-        //    .where(P.neq(readerId))                            // Exclude the original reader
-        //    .outE("has-read")                                     // Find books read by these other readers
-        //    .where(P.not(__.in_("has-read").hasId(readerId))) // Exclude books already read by the original reader
-        //    .dedup()                                             // Remove duplicates
-        //    .valueMap()                                          // Fetch properties of these recommended books
-        //    .toList();                                           // Collect the results into a list
-
-        //console.log(readBooks);
 
         await driverConnection.close();
         return {
             statusCode: 200,
-            body: JSON.stringify(allBooks),
+            body: JSON.stringify(suggestedBooks),
         };
     } 
     
