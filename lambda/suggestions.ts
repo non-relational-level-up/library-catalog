@@ -34,7 +34,7 @@ export const handler: APIGatewayProxyHandler = async (event) => {
 
         // Suggest books based on similar readers' interests
         const suggestedBooks = await graph.V(readerId)
-            .outE()                  // Books read by the current reader
+            .outE()                   // Books read by the current reader
             .in_("has-read")                 // Other readers who read the same books
             .outE()                 // Books read by these other readers
             .dedup()                         // Remove duplicate books
@@ -42,6 +42,8 @@ export const handler: APIGatewayProxyHandler = async (event) => {
             .valueMap(true)
             .by(statics.unfold())
             .toList();
+
+        console.log(suggestedBooks);
 
         await driverConnection.close();
         return {
