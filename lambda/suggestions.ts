@@ -32,8 +32,8 @@ export const handler: APIGatewayProxyHandler = async (event) => {
         //console.log(readBooks);
         //console.log("============================");
 
-        for (const book in readBooks) {
-            console.log(book);
+        for (let i=0; i<readBooks.length; i++) {
+            console.log(JSON.stringify(readBooks.at(i)));
         }
         console.log("============================");
 
