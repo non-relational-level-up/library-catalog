@@ -35,7 +35,7 @@ export const handler: APIGatewayProxyHandler = async (event) => {
             .inV()
             .aggregate("s")
             .in_("has-read")                 // Move back to reader vertices who have read these same books
-            .where(P.neq(reader.value.id))   // Filter out the original reader. We only want other readers.
+            .where(P.neq(reader.value))   // Filter out the original reader. We only want other readers.
             .inV()                           // move to subjects (destination nodes/vertices)
             .dedup()                         // remove duplicates
             .valueMap(true)
