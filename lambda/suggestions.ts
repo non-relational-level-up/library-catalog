@@ -15,7 +15,9 @@ export const handler: APIGatewayProxyHandler = async (event) => {
             .has("username", username)
             .next();
 
-        console.log("reader: " + reader.value);
+            
+        console.log("reader: " + reader);
+        console.log("reader.value: " + reader.value);
 
         const readBooks = await graph.V(reader.value.id)
             .outE("has-read")
