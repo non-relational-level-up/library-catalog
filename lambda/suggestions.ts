@@ -1,6 +1,7 @@
 import { type APIGatewayProxyHandler } from 'aws-lambda';
 import { getNeptuneConnection } from '../utils/dbUtils';
 import * as gremlin from 'gremlin';
+const __ = gremlin.process.statics;
 
 export const handler: APIGatewayProxyHandler = async (event) => {
     const {driverConnection, graph} = getNeptuneConnection();
@@ -30,17 +31,15 @@ export const handler: APIGatewayProxyHandler = async (event) => {
         console.log(readBooks);
         console.log("============================");
 
-        const suggestions = await graph.V(reader.value)
-            .outE("has-read")
-            .inV()
-            .aggregate("s")
-            .in_("has-read")                 // Move back to reader vertices who have read these same books
-            .where(P.neq(reader.value))   // Filter out the original reader. We only want other readers.
-            .inV()                           // move to subjects (destination nodes/vertices)
-            .dedup()                         // remove duplicates
-            .valueMap(true)
-            .by(statics.unfold())
-            .toList();
+        const suggestions = await graph.V(reader.value)          // Start from a specific reader vertex
+            .out("has-read")                                     // Find all books this reader has read
+            .in_("has-read")                                     // Find other readers of these same books
+            .where(P.neq(reader.value))                          // Exclude the original reader
+            .out("has-read")                                     // Find books read by these other readers
+            .where(P.not(__.in_("has-read").hasId(reader.value))) // Exclude books already read by the original reader
+            .dedup()                                             // Remove duplicates
+            .valueMap()                                          // Fetch properties of these recommended books
+            .toList();                                           // Collect the results into a list
 
         console.log(suggestions);
 
