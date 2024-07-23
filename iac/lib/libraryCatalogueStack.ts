@@ -128,6 +128,10 @@ export class LibraryCatalogueStack extends cdk.Stack {
             entry: path.join(lambdaAppDir, 'hello.ts'),
         });
 
+        const ageGroupLambda = createLambda('age-group-lambda', {
+            entry: path.join(lambdaAppDir, 'geGroup.ts'),
+        });
+
         // API
         const api = new RestApi(this, `${appName}-api-gateway`, {
             deployOptions: {stageName: 'prod'},
@@ -142,6 +146,7 @@ export class LibraryCatalogueStack extends cdk.Stack {
 
         const apiResource = api.root.addResource('api');
         apiResource.addResource('hello').addMethod(HttpMethod.GET, new LambdaIntegration(helloLambda));
+        apiResource.addResource('ageGroup').addMethod(HttpMethod.GET, new LambdaIntegration(ageGroupLambda));
 
     }
 }
