@@ -5,7 +5,7 @@ import * as gremlin from 'gremlin';
 export const handler: APIGatewayProxyHandler = async (event) => {
     const {driverConnection, graph} = getNeptuneConnection();
     const statics = gremlin.process.statics;
-    const ageGroup = parseInt(event.pathParameters?.ageGroup || '0', 10);
+    const ageGroup = parseInt(event.pathParameters?.ageGroup || '1', 10);
 
     if (isNaN(ageGroup)) {
         return {
