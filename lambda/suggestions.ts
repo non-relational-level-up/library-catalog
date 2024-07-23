@@ -1,5 +1,5 @@
-import {type APIGatewayProxyHandler} from 'aws-lambda';
-import {getNeptuneConnection} from '../utils/dbUtils';
+import { type APIGatewayProxyHandler } from 'aws-lambda';
+import { getNeptuneConnection } from '../utils/dbUtils';
 import * as gremlin from 'gremlin';
 
 export const handler: APIGatewayProxyHandler = async (event) => {
