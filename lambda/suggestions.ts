@@ -25,21 +25,25 @@ export const handler: APIGatewayProxyHandler = async (event) => {
             .outE("has-read")
             .inV()
             .valueMap(true)
-            .by(statics.unfold());
+            .by(statics.unfold())
+            .toList();
 
         console.log("============================");
-        //console.log(readBooks);
-        //console.log("============================");
-
-        while (readBooks.hasNext()) {
-            console.log(JSON.stringify(readBooks.next()));
-        }
+        console.log(readBooks);
         console.log("============================");
 
-        //const suggestions = await graph.V(readerId)          // Start from a specific reader vertex
-        //    .outE("has-read")                                     // Find all books this reader has read
-        //    .in_("has-read")                                     // Find other readers of these same books
-        //    .outE("has-read")                                     // Find books read by these other readers
+        const allBooks = await graph.V(readerId)          // Start from a specific reader vertex
+            .outE("has-read")                                     // Find all books this reader has read
+            .in_("has-read")                                     // Find other readers of these same books
+            .outE("has-read")                                     // Find books read by these other readers
+            .valueMap(true)
+            .by(statics.unfold())
+            .toList();
+        
+        console.log("============================");
+        console.log(allBooks);
+        console.log("============================");
+    
         //    .where(P.neq(readerId))                            // Exclude the original reader
         //    .outE("has-read")                                     // Find books read by these other readers
         //    .where(P.not(__.in_("has-read").hasId(readerId))) // Exclude books already read by the original reader
@@ -52,7 +56,7 @@ export const handler: APIGatewayProxyHandler = async (event) => {
         await driverConnection.close();
         return {
             statusCode: 200,
-            body: JSON.stringify(readBooks),
+            body: JSON.stringify(allBooks),
         };
     } 
     
