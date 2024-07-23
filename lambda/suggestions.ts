@@ -19,7 +19,7 @@ export const handler: APIGatewayProxyHandler = async (event) => {
         console.log("reader: " + reader);
         console.log("reader.value: " + reader.value);
 
-        const readBooks = await graph.V(reader.value.id)
+        const readBooks = await graph.V(reader.value)
             .outE("has-read")
             .inV()
             .valueMap(true)
