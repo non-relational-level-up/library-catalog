@@ -19,8 +19,9 @@ export const handler: APIGatewayProxyHandler = async (event) => {
             
         console.log("reader: " + JSON.stringify(reader));
         console.log("reader.value: " + reader.value);
+        const readerId = reader.value;
 
-        const readBooks = await graph.V(reader.value)
+        const readBooks = await graph.V(readerId)
             .outE("has-read")
             .inV()
             .valueMap(true)
@@ -31,12 +32,12 @@ export const handler: APIGatewayProxyHandler = async (event) => {
         console.log(readBooks);
         console.log("============================");
 
-        const suggestions = await graph.V(reader.value)          // Start from a specific reader vertex
-            .out("has-read")                                     // Find all books this reader has read
+        const suggestions = await graph.V(readerId)          // Start from a specific reader vertex
+            .outE("has-read")                                     // Find all books this reader has read
             .in_("has-read")                                     // Find other readers of these same books
-            .where(P.neq(reader.value))                          // Exclude the original reader
-            .out("has-read")                                     // Find books read by these other readers
-            .where(P.not(__.in_("has-read").hasId(reader.value))) // Exclude books already read by the original reader
+            .where(P.neq(readerId))                          // Exclude the original reader
+            .outE("has-read")                                     // Find books read by these other readers
+            .where(P.not(__.in_("has-read").hasId(readerId))) // Exclude books already read by the original reader
             .dedup()                                             // Remove duplicates
             .valueMap()                                          // Fetch properties of these recommended books
             .toList();                                           // Collect the results into a list
