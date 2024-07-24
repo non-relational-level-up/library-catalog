@@ -51,10 +51,10 @@ export const handler: APIGatewayProxyHandler = async (event) => {
             .dedup()                         // Remove duplicate books
             .where(__.not(__.in_("has-read").hasId(readerId)))  // Exclude books already read by the current reader
             .limit(3)
-            .project("id", "title", "publicationYear")
+            .project("title", "publicationYear")
             .order()
             .by('publicationYear')
-            .values("id", "title", "publicationYear")
+            .values("title", "publicationYear")
             .toList();
 
         console.log("Suggested Books:");
