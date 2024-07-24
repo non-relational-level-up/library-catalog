@@ -8,15 +8,6 @@ export const handler: APIGatewayProxyHandler = async (event) => {
     const statics = gremlin.process.statics;
     const P = gremlin.process.P;
 
-    const ageGroup = event.pathParameters?.username || '';
-
-    if (!ageGroup) {
-        return {
-            statusCode: 400,
-            body: JSON.stringify({ message: 'Age group parameter is required' }),
-        };
-    }
-
     try {
         //const output = await graph.V().valueMap().by(statics.unfold()).toList();
         const username = "wandile";
