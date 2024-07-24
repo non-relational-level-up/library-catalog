@@ -19,20 +19,14 @@ export const handler: APIGatewayProxyHandler = async (event) => {
             .hasLabel('AgeGroup')
             .has('ageGroup', ageGroup)
             .in_('suitable-for')
-            .dedup()
-            .limit(3)
-            .project('title', 'publicationYear')
-            .by('title')
-            .by('publicationYear')
+            .valueMap('title', 'publicationYear')
             .toList();
 
-        console.log(`Books suitable for age group ${ageGroup}:`);
-        console.log(books);
-
         await driverConnection.close();
+
         return {
             statusCode: 200,
-            body: JSON.stringify(books),
+            body: JSON.stringify({ books }),
         };
     } catch (e) {
         await driverConnection.close();
