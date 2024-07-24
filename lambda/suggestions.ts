@@ -52,13 +52,14 @@ export const handler: APIGatewayProxyHandler = async (event) => {
                 .by("title")
                 .toList();
 
-        //const jsonBooks = suggestedBooks.map((book: any) => {
-        //    const obj: { [key: string]: any } = {};
-        //    book.forEach((value: any, key: any) => {
-        //        obj[key] = value;
-        //    });
-        //    return obj;
-        //});
+        const jsonBooks = [];
+        suggestedBooks.forEach((book: any) => {
+            const obj: { [key: string]: any } = {};
+            book.forEach((value: any, key: any) => {
+                obj[key] = value;
+            });
+            jsonBooks.push(obj)
+        });
         const output = { suggestions: suggestedBooks}
         console.log(output);
         console.log("Suggested Books:");
