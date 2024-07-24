@@ -50,23 +50,25 @@ export const handler: APIGatewayProxyHandler = async (event) => {
                 .limit(3)
                 .project("title")
                 .by("title")
+                .values("title")
                 .toList();
 
-        const jsonBooks = suggestedBooks.map((book: any) => {
-            const obj: { [key: string]: any } = {};
-            book.forEach((value: any, key: any) => {
-                obj[key] = value;
-            });
-            return obj;
-        });
-
+        //const jsonBooks = suggestedBooks.map((book: any) => {
+        //    const obj: { [key: string]: any } = {};
+        //    book.forEach((value: any, key: any) => {
+        //        obj[key] = value;
+        //    });
+        //    return obj;
+        //});
+        const output = { suggestions: suggestedBooks}
+        console.log(output);
         console.log("Suggested Books:");
-        console.log(JSON.stringify(jsonBooks, null, 2));
+        //console.log(JSON.stringify(jsonBooks, null, 2));
 
         await driverConnection.close();
         return {
             statusCode: 200,
-            body: JSON.stringify(jsonBooks, null, 2),
+            body: JSON.stringify(output),
         };
     } 
     

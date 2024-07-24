@@ -21,7 +21,12 @@ export const handler: APIGatewayProxyHandler = async (event) => {
                         .hasId(readerId)
                     )
                 )
-                .dedup().order().by('publicationYear').limit(3).values('title').toList();
+                .dedup()
+                .order()
+                .by('publicationYear')
+                .limit(3)
+                .values('title')
+                .toList();
         await driverConnection.close();
         const output = { suggestions: books}
         console.log(output);
