@@ -49,25 +49,18 @@ export const handler: APIGatewayProxyHandler = async (event) => {
                 .dedup()                         // Remove duplicate books
                 .where(__.not(__.in_("has-read").hasId(readerId)))  // Exclude books already read by the current reader
                 .limit(3)
-                .project("title")
-                .by("title")
+                .value("title")
                 .toList();
 
-        const jsonBooks = suggestedBooks.map((book: any) => {
-            const obj: { [key: string]: any } = {};
-            book.forEach((value: any, key: any) => {
-                obj[key] = value;
-            });
-            return obj;
-        });
+        const output = { suggestions: suggestedBooks }
 
         console.log("Suggested Books:");
-        console.log(JSON.stringify(jsonBooks, null, 2));
+        console.log(output);
 
         await driverConnection.close();
         return {
             statusCode: 200,
-            body: JSON.stringify(jsonBooks, null, 2),
+            body: JSON.stringify(output),
         };
     } 
     
