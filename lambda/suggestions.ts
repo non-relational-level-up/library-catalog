@@ -34,18 +34,17 @@ export const handler: APIGatewayProxyHandler = async (event) => {
 
         // Suggest books based on similar readers' interests
         const suggestedBooks = await graph.V(readerId)
-            .out("has-read")                 // Books read by the current reader
-            .in_("has-read")                 // Other readers who read the same books
-            .out("has-read")                 // Books read by these other readers
-            .dedup()                         // Remove duplicate books
-            .where(__.not(__.in_("has-read").hasId(readerId)))  // Exclude books already read by the current reader
-            .limit(3)
-            .project("id", "title", "publicationYear")
-            .by(__.id())
-            .by("title")
-            .by(__.in_("wrote")
-            .values("title", "publicationYear","name"))
-            .toList();
+                .out("has-read")                 // Books read by the current reader
+                .in_("has-read")                 // Other readers who read the same books
+                .out("has-read")                 // Books read by these other readers
+                .dedup()                         // Remove duplicate books
+                .where(__.not(__.in_("has-read").hasId(readerId)))  // Exclude books already read by the current reader
+                .limit(3)
+                .project("id", "title", "publicationYear")
+                .by(__.id())
+                .by("title")
+                .by(__.in_("wrote").values("name"))
+                .toList();
 
         console.log("Suggested Books:");
         console.log(JSON.stringify(suggestedBooks, null, 2));
