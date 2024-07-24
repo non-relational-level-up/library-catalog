@@ -27,11 +27,25 @@ export const handler: APIGatewayProxyHandler = async (event) => {
 
         console.log(`Books suitable for age group ${ageGroup}:`);
         console.log(books);
+
+        const suggestedBookDetails = books.map(bookMap => {
+            const bookObject: { [key: string]: any } = {};
+            Object.entries(bookMap).forEach(([key, value]) => {
+                if (typeof key === 'object' && (key as string).constructor.name === 'EnumValue') {
+                    bookObject[(key as { elementName: string }).elementName] = value;
+                } 
+                else {
+                    bookObject[key] = value;
+                }
+            });
+            return bookObject;
+        });
+
         await driverConnection.close();
 
         return {
             statusCode: 200,
-            body: JSON.stringify({ books }),
+            body: JSON.stringify(suggestedBookDetails),
         };
     } catch (e) {
         await driverConnection.close();
