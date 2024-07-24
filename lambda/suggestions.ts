@@ -1,6 +1,7 @@
 import { type APIGatewayProxyHandler } from 'aws-lambda';
 import { getNeptuneConnection } from '../utils/dbUtils';
 import * as gremlin from 'gremlin';
+import { json } from 'stream/consumers';
 const __ = gremlin.process.statics;
 
 export const handler: APIGatewayProxyHandler = async (event) => {
@@ -52,15 +53,20 @@ export const handler: APIGatewayProxyHandler = async (event) => {
                 .by("title")
                 .toList();
 
-        const jsonBooks = [];
-        suggestedBooks.forEach((book: any) => {
+        const responseList: any = [];
+        const jsonBooks = suggestedBooks.map((book: any) => {
             const obj: { [key: string]: any } = {};
             book.forEach((value: any, key: any) => {
                 obj[key] = value;
             });
-            jsonBooks.push(obj)
+            return obj;
         });
-        const output = { suggestions: suggestedBooks}
+        
+        jsonBooks.forEach((book: any) => {
+            responseList.push(book["title"]);
+        });
+
+        const output = { suggestions: responseList };
         console.log(output);
         console.log("Suggested Books:");
         //console.log(JSON.stringify(jsonBooks, null, 2));
