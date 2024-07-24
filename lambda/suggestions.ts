@@ -1,7 +1,6 @@
 import { type APIGatewayProxyHandler } from 'aws-lambda';
 import { getNeptuneConnection } from '../utils/dbUtils';
 import * as gremlin from 'gremlin';
-import { json } from 'stream/consumers';
 const __ = gremlin.process.statics;
 
 export const handler: APIGatewayProxyHandler = async (event) => {
@@ -9,17 +8,16 @@ export const handler: APIGatewayProxyHandler = async (event) => {
     const statics = gremlin.process.statics;
     const P = gremlin.process.P;
 
-    //const ageGroup = event.pathParameters?.username || '';
-    //if (!ageGroup) {
-    //    return {
-    //        statusCode: 400,
-    //        body: JSON.stringify({ message: 'Age group parameter is required' }),
-    //    };
-    //}
+    const username = event.pathParameters?.username || '';
+    if (!username) {
+        return {
+            statusCode: 400,
+            body: JSON.stringify({ message: 'Username is required' }),
+        };
+    }
 
     try {
-        //const output = await graph.V().valueMap().by(statics.unfold()).toList();
-        const username = "wandile";
+        //const username = "wandile";
         const reader = await graph.V()
             .hasLabel("Reader")
             .has("username", username)
@@ -37,9 +35,9 @@ export const handler: APIGatewayProxyHandler = async (event) => {
             .by(statics.unfold())
             .toList();
 
-        console.log("============================");
-        console.log(readBooks);
-        console.log("============================");
+        //console.log("============================");
+        //console.log(readBooks);
+        //console.log("============================");
 
         // Suggest books based on similar readers' interests
         const suggestedBooks = await graph.V(readerId)
@@ -67,9 +65,8 @@ export const handler: APIGatewayProxyHandler = async (event) => {
         });
 
         const output = { suggestions: responseList };
-        console.log(output);
         console.log("Suggested Books:");
-        //console.log(JSON.stringify(jsonBooks, null, 2));
+        console.log(output);
 
         await driverConnection.close();
         return {
