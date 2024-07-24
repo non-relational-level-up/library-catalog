@@ -16,12 +16,6 @@ export const handler: APIGatewayProxyHandler = async (event) => {
 
     try {
         const books = await graph.V()
-<<<<<<< Updated upstream
-            .hasLabel('AgeGroup')
-            .has('ageGroup', ageGroup)
-            .in_('suitable-for')
-            .valueMap('title', 'publicationYear')
-=======
             .hasLabel("AgeGroup")
             .has("ageGroup", ageGroup)
             .in_("suitable-for")
@@ -30,7 +24,6 @@ export const handler: APIGatewayProxyHandler = async (event) => {
             .project("title", "publicationYear")
             .by("title")
             .by("publicationYear")
->>>>>>> Stashed changes
             .toList();
 
         await driverConnection.close();
