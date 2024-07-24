@@ -40,7 +40,7 @@ export const handler: APIGatewayProxyHandler = async (event) => {
                 .dedup()                         // Remove duplicate books
                 .where(__.not(__.in_("has-read").hasId(readerId)))  // Exclude books already read by the current reader
                 .limit(3)
-                .valueMap(true)
+                .valueMap(true, "title", "publicationYear")
                 .by(statics.unfold())
                 .toList();
 
