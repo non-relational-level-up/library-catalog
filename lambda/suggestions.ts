@@ -45,15 +45,7 @@ export const handler: APIGatewayProxyHandler = async (event) => {
                 .toList();
 
         console.log("Suggested Books:");
-        console.log(JSON.stringify(suggestedBooks, null, 2));
-
-        if (suggestedBooks.length === 0) {
-            console.log("No suggested books found. Debugging information:");
-            const booksReadByUser = await graph.V(readerId).out("has-read").count().next();
-            console.log(`Books read by user: ${booksReadByUser.value}`);
-            const otherReaders = await graph.V(readerId).out("has-read").in_("has-read").dedup().count().next();
-            console.log(`Other readers with similar tastes: ${otherReaders.value}`);
-        }
+        console.log(suggestedBooks);
 
         await driverConnection.close();
         return {
