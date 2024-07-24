@@ -20,7 +20,6 @@ export const handler: APIGatewayProxyHandler = async (event) => {
             .has("ageGroup", ageGroup)
             .in_("suitable-for")
             .dedup()
-            .limit(3)
             .project("title", "publicationYear")
             .by("title")
             .by("publicationYear")
