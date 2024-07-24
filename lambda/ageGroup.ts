@@ -26,6 +26,8 @@ export const handler: APIGatewayProxyHandler = async (event) => {
             .by("publicationYear")
             .toList();
 
+        console.log(`Books suitable for age group ${ageGroup}:`);
+        console.log(books);
         await driverConnection.close();
 
         return {
