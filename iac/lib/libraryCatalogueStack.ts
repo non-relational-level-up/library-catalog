@@ -191,7 +191,7 @@ export class LibraryCatalogueStack extends cdk.Stack {
         apiResource.addResource('hello').addMethod(HttpMethod.GET, new LambdaIntegration(helloLambda));
         apiResource.addResource('genre').addResource('{genre}').addMethod(HttpMethod.GET, new LambdaIntegration(booksByGenreLambda))
         apiResource.addResource('series').addResource('{series}').addMethod(HttpMethod.GET, new LambdaIntegration(booksBySeriesLambda))
-        suggestResource.addResource('genre').addResource('{readerId}').addMethod(HttpMethod.GET, new LambdaIntegration(suggestionBooksByGenreLambda))
-        suggestResource.addResource('series').addResource('{readerId}').addMethod(HttpMethod.GET, new LambdaIntegration(suggestionBooksBySeriesLambda))
+        suggestResource.addResource('genre').addResource('{userId}').addMethod(HttpMethod.GET, new LambdaIntegration(suggestionBooksByGenreLambda))
+        suggestResource.addResource('series').addResource('{userId}').addMethod(HttpMethod.GET, new LambdaIntegration(suggestionBooksBySeriesLambda))
     }
 }
