@@ -58,7 +58,7 @@ export const handler: APIGatewayProxyHandler = async (event) => {
             .toList();
 
         console.log("Suggested Books:");
-        console.log(JSON.stringify(suggestedBooks.values));
+        console.log(JSON.stringify(suggestedBooks, null, 2));
 
         if (suggestedBooks.length === 0) {
             console.log("No suggested books found. Debugging information:");
@@ -71,7 +71,7 @@ export const handler: APIGatewayProxyHandler = async (event) => {
         await driverConnection.close();
         return {
             statusCode: 200,
-            body: JSON.stringify(suggestedBooks.values),
+            body: JSON.stringify(suggestedBooks, null, 2),
         };
     } 
     
