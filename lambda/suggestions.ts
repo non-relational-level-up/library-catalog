@@ -52,13 +52,13 @@ export const handler: APIGatewayProxyHandler = async (event) => {
             .where(__.not(__.in_("has-read").hasId(readerId)))  // Exclude books already read by the current reader
             .limit(3)
             .project("id", "title", "publicationYear")
-            .by(__.id())
-            .by("title")
-            .by(__.in_("wrote").values("name"))
+            .order()
+            .by('publicationYear')
+            .values("id", "title", "publicationYear")
             .toList();
 
         console.log("Suggested Books:");
-        console.log(JSON.stringify(suggestedBooks, null, 2));
+        console.log(JSON.stringify(suggestedBooks));
 
         if (suggestedBooks.length === 0) {
             console.log("No suggested books found. Debugging information:");
