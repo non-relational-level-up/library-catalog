@@ -1,5 +1,5 @@
 import * as cdk from 'aws-cdk-lib';
-import {aws_ec2, Duration} from 'aws-cdk-lib';
+import {Duration} from 'aws-cdk-lib';
 import {Construct} from 'constructs';
 import {GitHubStackProps} from './githubStackProps';
 import {
@@ -19,20 +19,7 @@ import {Runtime} from 'aws-cdk-lib/aws-lambda';
 import {Cors, LambdaIntegration, RestApi} from 'aws-cdk-lib/aws-apigateway';
 import * as path from 'path';
 import {HttpMethod} from 'aws-cdk-lib/aws-apigatewayv2';
-import {
-    GatewayVpcEndpointAwsService,
-    Instance,
-    InstanceClass,
-    InstanceSize,
-    KeyPair,
-    KeyPairType,
-    MachineImage,
-    Peer,
-    Port,
-    SecurityGroup,
-    SubnetType,
-    Vpc
-} from 'aws-cdk-lib/aws-ec2';
+import {GatewayVpcEndpointAwsService, SubnetType, Vpc} from 'aws-cdk-lib/aws-ec2';
 import {Bucket} from 'aws-cdk-lib/aws-s3';
 
 export class LibraryCatalogueStack extends cdk.Stack {
@@ -116,23 +103,6 @@ export class LibraryCatalogueStack extends cdk.Stack {
         const s3Bucket = new Bucket(this, 'library-catalogue-bucket', {
             bucketName: 'library-catalogue-bucket',
         });
-
-        //EC2
-        const ec2Sg = new SecurityGroup(this, 'ec2-sg', {
-            vpc: vpc,
-            allowAllOutbound: true
-        });
-
-        ec2Sg.addIngressRule(Peer.anyIpv4(), Port.tcp(22));
-
-        const ec2Instance = new Instance(this, 'scratch-pad-ec2', {
-            vpc: vpc,
-            instanceType: aws_ec2.InstanceType.of(InstanceClass.T3, InstanceSize.MICRO),
-            machineImage: MachineImage.latestAmazonLinux2023(),
-            keyPair: new KeyPair(this, 'ec2-key-pair', {keyPairName: 'ec2-key-pair', type: KeyPairType.RSA}),
-            securityGroup: ec2Sg,
-        });
-
 
         // Lambdas
         const lambdaEnv = {
