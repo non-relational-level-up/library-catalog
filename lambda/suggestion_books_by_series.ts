@@ -8,8 +8,9 @@ export const handler: APIGatewayProxyHandler = async (event) => {
 
     try {
         const readerId = event.pathParameters?.userId;
-        const output = await graph.V(readerId).out().hasLabel('Book').out().hasLabel('Series').in_().hasLabel('Book').where(statics.not(statics.in_("has-read").hasId(readerId))).dedup().order().by('publicationYear').limit(3).values('title').toList();
+        const books = await graph.V(readerId).out().hasLabel('Book').out().hasLabel('Series').in_().hasLabel('Book').where(statics.not(statics.in_("has-read").hasId(readerId))).dedup().order().by('publicationYear').limit(3).values('title').toList();
         await driverConnection.close();
+        const output = { suggestion: books}
         console.log(output);
         return {
             statusCode: 200,
