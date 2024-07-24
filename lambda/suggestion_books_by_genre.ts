@@ -11,7 +11,7 @@ export const handler: APIGatewayProxyHandler = async (event) => {
         console.log(userId);
         const readList = await graph.V(userId).out().hasLabel('Book').id().toList();
         console.log(readList);
-        const output = await graph.V(userId).out().hasLabel('Book').out().hasLabel('Genre').in_().hasLabel('Book').not().hasId('b-1').dedup().limit(3).values('title').toList();
+        const output = await graph.V(userId).out().hasLabel('Book').out().hasLabel('Genre').in_().hasLabel('Book').hasId(readList).dedup().limit(3).values('title').toList();
         await driverConnection.close();
         console.log(output);
         return {
