@@ -7,7 +7,8 @@ export const handler: APIGatewayProxyHandler = async (event) => {
     const statics = gremlin.process.statics;
 
     try {
-        const series = event.pathParameters?.series;
+        const series = event.pathParameters?.series?.replace('%20', ' ');;
+        console.log(series);
         const output = await graph.V().has('name', series).in_().hasLabel('Book').values('title').toList();
         await driverConnection.close();
         console.log(output);
