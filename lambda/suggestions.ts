@@ -10,28 +10,27 @@ export const handler: APIGatewayProxyHandler = async (event) => {
 
     try {
         //const output = await graph.V().valueMap().by(statics.unfold()).toList();
-        const username = event.queryStringParameters?.username || "wandile";
+        const username = "wandile";
         const reader = await graph.V()
             .hasLabel("Reader")
             .has("username", username)
             .next();
 
-        if (!reader.value) {
-            throw new Error(`Reader with username ${username} not found`);
-        }
-
-        console.log("Reader:", JSON.stringify(reader));
-        const readerId = reader.value.id;
+            
+        console.log("reader: " + JSON.stringify(reader));
+        console.log("reader.value: " + reader.value);
+        const readerId = reader.value;
 
         const readBooks = await graph.V(readerId)
-            .out("has-read")
-            .project("id", "title", "author")
-            .by(__.id())
-            .by("title")
-            .by(__.in("wrote").values("name"))
+            .outE("has-read")
+            .inV()
+            .valueMap(true)
+            .by(statics.unfold())
             .toList();
 
-        console.log("Books read by user:", JSON.stringify(readBooks, null, 2));
+        console.log("============================");
+        console.log(readBooks);
+        console.log("============================");
 
         // Suggest books based on similar readers' interests
         const suggestedBooks = await graph.V(readerId)
@@ -41,13 +40,14 @@ export const handler: APIGatewayProxyHandler = async (event) => {
             .dedup()                         // Remove duplicate books
             .where(__.not(__.in_("has-read").hasId(readerId)))  // Exclude books already read by the current reader
             .limit(3)
-            .project("id", "title", "author")
+            .project("id", "title", "publicationYear")
             .by(__.id())
             .by("title")
-            .by(__.in("wrote").values("name"))
+            .by(__.in_("wrote").values("name"))
             .toList();
 
-        console.log("Suggested Books:", JSON.stringify(suggestedBooks, null, 2));
+        console.log("Suggested Books:");
+        console.log(JSON.stringify(suggestedBooks, null, 2));
 
         if (suggestedBooks.length === 0) {
             console.log("No suggested books found. Debugging information:");
@@ -60,15 +60,7 @@ export const handler: APIGatewayProxyHandler = async (event) => {
         await driverConnection.close();
         return {
             statusCode: 200,
-            headers: {
-                'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Credentials': true,
-            },
-            body: JSON.stringify({
-                readBooks: readBooks,
-                suggestedBooks: suggestedBooks
-            }),
+            body: JSON.stringify(suggestedBooks),
         };
     } 
     
