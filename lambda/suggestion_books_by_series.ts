@@ -9,7 +9,7 @@ export const handler: APIGatewayProxyHandler = async (event) => {
     try {
         const userId = event.pathParameters?.userId;
         const readList = await graph.V(userId).out().hasLabel('Book');
-        const output = await graph.V(userId).out().hasLabel('Book').out().hasLabel('Series').in_().hasLabel('Book').dedup().limit(3).values('title').toList();
+        const output = await graph.V(userId).out().hasLabel('Book').out().hasLabel('Series').in_().hasLabel('Book').hasId(readList).dedup().limit(3).values('title').toList();
         await driverConnection.close();
         console.log(output);
         return {
