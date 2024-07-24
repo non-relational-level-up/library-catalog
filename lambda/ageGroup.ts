@@ -20,6 +20,7 @@ export const handler: APIGatewayProxyHandler = async (event) => {
             .has("ageGroup", ageGroup)
             .in_("suitable-for")
             .dedup()
+            .limit(3)
             .project("title", "publicationYear")
             .by("title")
             .by("publicationYear")
@@ -28,19 +29,22 @@ export const handler: APIGatewayProxyHandler = async (event) => {
         console.log(`Books suitable for age group ${ageGroup}:`);
         console.log(books);
 
-        const formattedBooks = books.map(book => {
-            const bookObj = book as { title: string, publicationYear: number };
-            return {
-                title: bookObj.title,
-                publicationYear: bookObj.publicationYear
-            };
+
+        const jsonBooks = books.map((book: any) => {
+            const obj: { [key: string]: any } = {};
+            book.forEach((value: any, key: any) => {
+                obj[key] = value;
+            });
+            return obj;
         });
 
+        console.log(JSON.stringify(jsonBooks, null, 2));
+        
         await driverConnection.close();
 
         return {
             statusCode: 200,
-            body: JSON.stringify(formattedBooks),
+            body: JSON.stringify(jsonBooks, null, 2),
         };
     } catch (e) {
         await driverConnection.close();
