@@ -28,24 +28,19 @@ export const handler: APIGatewayProxyHandler = async (event) => {
         console.log(`Books suitable for age group ${ageGroup}:`);
         console.log(books);
 
-        const suggestedBookDetails = books.map(bookMap => {
-            const bookObject: { [key: string]: any } = {};
-            Object.entries(bookMap).forEach(([key, value]) => {
-                if (typeof key === 'object' && (key as string).constructor.name === 'EnumValue') {
-                    bookObject[(key as { elementName: string }).elementName] = value;
-                } 
-                else {
-                    bookObject[key] = value;
-                }
-            });
-            return bookObject;
+        const formattedBooks = books.map(book => {
+            const bookObj = book as { title: string, publicationYear: number };
+            return {
+                title: bookObj.title,
+                publicationYear: bookObj.publicationYear
+            };
         });
 
         await driverConnection.close();
 
         return {
             statusCode: 200,
-            body: JSON.stringify(suggestedBookDetails),
+            body: JSON.stringify(formattedBooks),
         };
     } catch (e) {
         await driverConnection.close();
