@@ -8,6 +8,14 @@ export const handler: APIGatewayProxyHandler = async (event) => {
     const statics = gremlin.process.statics;
     const P = gremlin.process.P;
 
+    //const ageGroup = event.pathParameters?.username || '';
+    //if (!ageGroup) {
+    //    return {
+    //        statusCode: 400,
+    //        body: JSON.stringify({ message: 'Age group parameter is required' }),
+    //    };
+    //}
+
     try {
         //const output = await graph.V().valueMap().by(statics.unfold()).toList();
         const username = "wandile";
@@ -40,18 +48,25 @@ export const handler: APIGatewayProxyHandler = async (event) => {
                 .dedup()                         // Remove duplicate books
                 .where(__.not(__.in_("has-read").hasId(readerId)))  // Exclude books already read by the current reader
                 .limit(3)
-                .value("title")
+                .project("title")
+                .by("title")
                 .toList();
 
-        const output = { suggestions: suggestedBooks }
+        const jsonBooks = suggestedBooks.map((book: any) => {
+            const obj: { [key: string]: any } = {};
+            book.forEach((value: any, key: any) => {
+                obj[key] = value;
+            });
+            return obj;
+        });
 
         console.log("Suggested Books:");
-        console.log(output);
+        console.log(JSON.stringify(jsonBooks, null, 2));
 
         await driverConnection.close();
         return {
             statusCode: 200,
-            body: JSON.stringify(output),
+            body: JSON.stringify(jsonBooks, null, 2),
         };
     } 
     
