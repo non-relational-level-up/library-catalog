@@ -8,6 +8,17 @@ export const handler: APIGatewayProxyHandler = async (event) => {
     const statics = gremlin.process.statics;
     const P = gremlin.process.P;
 
+    const convertToJson = (gremlinData: Map<string, any>) => {
+        // Do this so that JSON.stringify works for maps
+        (Map.prototype as any).toJSON = function () {
+            return Object.fromEntries(this);
+        };
+        const mapStrippedData = JSON.parse(JSON.stringify(gremlinData));
+        // Undo it so that we don't permanently pollute globals
+        (Map.prototype as any).toJSON = undefined;
+        return mapStrippedData;
+    }
+
     try {
         //const output = await graph.V().valueMap().by(statics.unfold()).toList();
         const username = "wandile";
@@ -47,7 +58,7 @@ export const handler: APIGatewayProxyHandler = async (event) => {
             .toList();
 
         console.log("Suggested Books:");
-        console.log(JSON.stringify(suggestedBooks, null, 2));
+        console.log(JSON.stringify(suggestedBooks.values));
 
         if (suggestedBooks.length === 0) {
             console.log("No suggested books found. Debugging information:");
@@ -60,7 +71,7 @@ export const handler: APIGatewayProxyHandler = async (event) => {
         await driverConnection.close();
         return {
             statusCode: 200,
-            body: JSON.stringify(suggestedBooks),
+            body: JSON.stringify(suggestedBooks.values),
         };
     } 
     
