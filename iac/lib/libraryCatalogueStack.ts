@@ -185,9 +185,7 @@ export class LibraryCatalogueStack extends cdk.Stack {
             new LambdaIntegration(suggestionLambda)
         );
 
-        const ageGroupSuggestionResource = apiResource.addResource('ageGroup');
-        const ageGroupResource = ageGroupSuggestionResource.addResource('{ageGroup}');
-        ageGroupResource.addMethod(HttpMethod.GET, new LambdaIntegration(ageGroupLambda));
+        apiResource.addResource('ageGroup').addResource('{ageGroup}').addMethod(HttpMethod.GET, new LambdaIntegration(ageGroupLambda));
 
     }
 }

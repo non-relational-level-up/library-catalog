@@ -21,7 +21,9 @@ export const handler: APIGatewayProxyHandler = async (event) => {
             .in_('suitable-for')
             .dedup()
             .limit(3)
-            .valueMap('title', 'publicationYear')
+            .project('title', 'publicationYear')
+            .by('title')
+            .by('publicationYear')
             .toList();
 
         console.log(`Books suitable for age group ${ageGroup}:`);
