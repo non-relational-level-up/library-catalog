@@ -1,0 +1,5 @@
+~id, ~label, fullName:string
+a-6, Author, "Brandon Sanderson"
+a-7, Author, "Patrick Rothfuss"
+a-8, Author, "Frank Herbert"
+a-9, Author, "Pierce Brown"

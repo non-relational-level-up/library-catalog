@@ -1,0 +1,25 @@
+~id, ~label, title:string, publicationYear:double
+b-11, Book, "Harry Potter and the Prisoner of Azkaban", 1999
+b-12, Book, "Harry Potter and the Goblet of Fire", 2000
+b-13, Book, "Harry Potter and the Order of the Phoenix", 2003
+b-14, Book, "Harry Potter and the Half-Blood Prince", 2005
+b-15, Book, "Harry Potter and the Deathly Hallows", 2007
+b-16, Book, "A Storm of Swords", 2000
+b-17, Book, "A Feast for Crows", 2005
+b-18, Book, "A Dance with Dragons", 2011
+b-19, Book, "The Return of the King", 1955
+b-20, Book, "The Way of Kings", 2010
+b-21, Book, "Words of Radiance", 2014
+b-22, Book, "Oathbringer", 2017
+b-23, Book, "Rhythm of War", 2020
+b-24, Book, "The Name of the Wind", 2007
+b-25, Book, "The Wise Man's Fear", 2011
+b-26, Book, "Dune", 1965
+b-27, Book, "Dune Messiah", 1969
+b-28, Book, "Children of Dune", 1976
+b-29, Book, "Red Rising", 2014
+b-30, Book, "Golden Son", 2015
+b-31, Book, "Morning Star", 2016
+b-32, Book, "Iron Gold", 2018
+b-33, Book, "Dark Age", 2019
+b-34, Book, "Light Bringer", 2023
