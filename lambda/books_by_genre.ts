@@ -8,7 +8,7 @@ export const handler: APIGatewayProxyHandler = async (event) => {
 
     try {
         const genre = event.pathParameters?.genre?.replace('%20', ' ');
-        const output = await graph.V().has('name', genre).in_().hasLabel('Book').values('title').toList();
+        const output = await graph.V().has('name', genre).in_().hasLabel('Book').values('title').order().by('publicationYear').toList();
         await driverConnection.close();
         console.log(output);
         return {
