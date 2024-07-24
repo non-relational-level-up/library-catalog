@@ -23,23 +23,23 @@ export const handler: APIGatewayProxyHandler = async (event) => {
             .limit(3)
             .project("title", "publicationYear")
             .by("title")
-            .by("publicationYear")
             .toList();
 
         console.log(`Books suitable for age group ${ageGroup}:`);
         console.log(books);
 
 
-        const jsonBooks = books.map((book: any) => {
+        const jsonBooks = books.reduce((acc: any[], book: any) => {
             const obj: { [key: string]: any } = {};
             book.forEach((value: any, key: any) => {
                 obj[key] = value;
             });
-            return obj;
-        });
+            acc.push(obj);
+            return acc;
+        }, []);
 
         console.log(JSON.stringify(jsonBooks, null, 2));
-        
+                
         await driverConnection.close();
 
         return {
