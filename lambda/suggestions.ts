@@ -8,17 +8,6 @@ export const handler: APIGatewayProxyHandler = async (event) => {
     const statics = gremlin.process.statics;
     const P = gremlin.process.P;
 
-    const convertToJson = (gremlinData: Map<string, any>) => {
-        // Do this so that JSON.stringify works for maps
-        (Map.prototype as any).toJSON = function () {
-            return Object.fromEntries(this);
-        };
-        const mapStrippedData = JSON.parse(JSON.stringify(gremlinData));
-        // Undo it so that we don't permanently pollute globals
-        (Map.prototype as any).toJSON = undefined;
-        return mapStrippedData;
-    }
-
     try {
         //const output = await graph.V().valueMap().by(statics.unfold()).toList();
         const username = "wandile";
@@ -51,14 +40,15 @@ export const handler: APIGatewayProxyHandler = async (event) => {
             .dedup()                         // Remove duplicate books
             .where(__.not(__.in_("has-read").hasId(readerId)))  // Exclude books already read by the current reader
             .limit(3)
-            .project("title", "publicationYear")
-            .order()
-            .by('publicationYear')
-            .values("title", "publicationYear")
+            .project("id", "title", "publicationYear")
+            .by(__.id())
+            .by("title")
+            .by(__.in_("wrote")
+            .values("title", "publicationYear","name"))
             .toList();
 
         console.log("Suggested Books:");
-        console.log(JSON.stringify(suggestedBooks));
+        console.log(JSON.stringify(suggestedBooks, null, 2));
 
         if (suggestedBooks.length === 0) {
             console.log("No suggested books found. Debugging information:");
@@ -71,7 +61,7 @@ export const handler: APIGatewayProxyHandler = async (event) => {
         await driverConnection.close();
         return {
             statusCode: 200,
-            body: JSON.stringify(suggestedBooks, null, 2),
+            body: JSON.stringify(suggestedBooks),
         };
     } 
     
