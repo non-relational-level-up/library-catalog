@@ -23,6 +23,7 @@ export const handler: APIGatewayProxyHandler = async (event) => {
             .limit(3)
             .project("title", "publicationYear")
             .by("title")
+            .by("publicationYear")
             .toList();
 
         console.log(`Books suitable for age group ${ageGroup}:`);
@@ -37,9 +38,11 @@ export const handler: APIGatewayProxyHandler = async (event) => {
             acc.push(obj);
             return acc;
         }, []);
+        const titles = books.map((book: any) => book.get("title"));
 
-        console.log(JSON.stringify(jsonBooks, null, 2));
-                
+        console.log("Titles: "+JSON.stringify(titles, null, 2));
+        console.log("Titless: "+JSON.stringify(titles, null, 1));
+
         await driverConnection.close();
 
         return {
