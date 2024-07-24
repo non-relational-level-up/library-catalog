@@ -50,7 +50,6 @@ export const handler: APIGatewayProxyHandler = async (event) => {
                 .limit(3)
                 .project("title")
                 .by("title")
-                .values("title")
                 .toList();
 
         //const jsonBooks = suggestedBooks.map((book: any) => {
