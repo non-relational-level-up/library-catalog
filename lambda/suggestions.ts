@@ -10,27 +10,28 @@ export const handler: APIGatewayProxyHandler = async (event) => {
 
     try {
         //const output = await graph.V().valueMap().by(statics.unfold()).toList();
-        const username = "wandile";
+        const username = event.queryStringParameters?.username || "wandile";
         const reader = await graph.V()
             .hasLabel("Reader")
             .has("username", username)
             .next();
 
-            
-        console.log("reader: " + JSON.stringify(reader));
-        console.log("reader.value: " + reader.value);
-        const readerId = reader.value;
+        if (!reader.value) {
+            throw new Error(`Reader with username ${username} not found`);
+        }
+
+        console.log("Reader:", JSON.stringify(reader));
+        const readerId = reader.value.id;
 
         const readBooks = await graph.V(readerId)
-            .outE("has-read")
-            .inV()
-            .valueMap(true)
-            .by(statics.unfold())
+            .out("has-read")
+            .project("id", "title", "author")
+            .by(__.id())
+            .by("title")
+            .by(__.in("wrote").values("name"))
             .toList();
 
-        console.log("============================");
-        console.log(readBooks);
-        console.log("============================");
+        console.log("Books read by user:", JSON.stringify(readBooks, null, 2));
 
         // Suggest books based on similar readers' interests
         const suggestedBooks = await graph.V(readerId)
@@ -46,8 +47,7 @@ export const handler: APIGatewayProxyHandler = async (event) => {
             .by(__.in("wrote").values("name"))
             .toList();
 
-        console.log("Suggested Books:");
-        console.log(JSON.stringify(suggestedBooks, null, 2));
+        console.log("Suggested Books:", JSON.stringify(suggestedBooks, null, 2));
 
         if (suggestedBooks.length === 0) {
             console.log("No suggested books found. Debugging information:");
@@ -60,7 +60,15 @@ export const handler: APIGatewayProxyHandler = async (event) => {
         await driverConnection.close();
         return {
             statusCode: 200,
-            body: JSON.stringify(suggestedBooks),
+            headers: {
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Credentials': true,
+            },
+            body: JSON.stringify({
+                readBooks: readBooks,
+                suggestedBooks: suggestedBooks
+            }),
         };
     } 
     
