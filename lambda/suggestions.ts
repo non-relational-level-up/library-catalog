@@ -46,27 +46,30 @@ export const handler: APIGatewayProxyHandler = async (event) => {
 
         console.log(suggestedBooks);
 
-        const suggestedBookDetails = suggestedBooks.map(bookMap => {
-            const bookObject: { [key: string]: any } = {};
-            Object.entries(bookMap).forEach(([key, value]) => {
-                if (typeof key === 'object' && (key as string).constructor.name === 'EnumValue') {
-                    bookObject[(key as { elementName: string }).elementName] = value;
-                } 
-                else {
-                    bookObject[key] = value;
+        const convertVertexToBook = (vertex: any): any => {
+            const book: { [key: string]: any } = {};
+            for (const [key, value] of Object.entries(vertex)) {
+                if (typeof key === 'object' && key.constructor.name === 'EnumValue') {
+                    book[key.elementName] = value;
+                } else if (Array.isArray(value) && value.length === 1) {
+                    book[key] = value[0];
+                } else {
+                    book[key] = value;
                 }
-            });
-            return bookObject;
-        });
+            }
+            return book;
+        };
+
+        const suggestedBookObjects = suggestedBooks.map(convertVertexToBook);
 
         console.log("============================");
-        console.log(suggestedBookDetails);
+        console.log(suggestedBookObjects);
         console.log("============================");
 
         await driverConnection.close();
         return {
             statusCode: 200,
-            body: JSON.stringify(suggestedBooks),
+            body: JSON.stringify(suggestedBookObjects),
         };
     } 
     
