@@ -1,4 +1,4 @@
-import { type APIGatewayProxyHandler } from 'aws-lambda';
+import { APIGatewayProxyHandler } from 'aws-lambda';
 import { getNeptuneConnection } from '../utils/dbUtils';
 import * as gremlin from 'gremlin';
 
@@ -16,31 +16,29 @@ export const handler: APIGatewayProxyHandler = async (event) => {
     }
 
     try {
-        // Add author vertex
-        const authorVertex = await graph.addV('Author')
-            .property('fullName', authorName)
-            .next();
+        // Function to find or create a vertex
+        const findOrCreateVertex = async (label: string, property: string, value: string) => {
+            let vertex = await graph.V().has(label, property, value).next();
+            if (!vertex.value) {
+                vertex = await graph.addV(label).property(property, value).next();
+            }
+            return vertex;
+        };
 
-        // Add book vertex
-        const bookVertex = await graph.addV('Book')
-            .property('title', title)
-            .property('publicationYear', publicationYear)
-            .next();
+        // Add or find author vertex
+        const authorVertex = await findOrCreateVertex('Author', 'fullName', authorName);
 
-        // Add genre vertex
-        const genreVertex = await graph.addV('Genre')
-            .property('name', genre)
-            .next();
+        // Add or find book vertex
+        const bookVertex = await findOrCreateVertex('Book', 'title', title);
+        
+        // Add or find genre vertex
+        const genreVertex = await findOrCreateVertex('Genre', 'name', genre);
 
-        // Add series vertex
-        const seriesVertex = await graph.addV('Series')
-            .property('name', series)
-            .next();
+        // Add or find series vertex
+        const seriesVertex = await findOrCreateVertex('Series', 'name', series);
 
-        // Add age group vertex
-        const ageGroupVertex = await graph.addV('AgeGroup')
-            .property('ageGroup', ageGroup)
-            .next();
+        // Add or find age group vertex
+        const ageGroupVertex = await findOrCreateVertex('AgeGroup', 'ageGroup', ageGroup);
 
         // Create edges
         await graph.V(authorVertex.value.id).as('a')
