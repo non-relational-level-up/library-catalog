@@ -180,6 +180,9 @@ export class LibraryCatalogueStack extends cdk.Stack {
                 allowCredentials: true,
             },
             apiKeySourceType: ApiKeySourceType.HEADER,
+            defaultMethodOptions: {
+                apiKeyRequired: true
+            }
         });
 
         api.deploymentStage.addApiKey(`${appName}-api-key`);
