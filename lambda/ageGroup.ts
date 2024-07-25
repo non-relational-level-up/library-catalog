@@ -28,10 +28,6 @@ export const handler: APIGatewayProxyHandler = async (event) => {
         const shuffledBooks = allBooks.sort(() => 0.5 - Math.random());
         const recommendations = shuffledBooks.slice(0, 3);
 
-        console.log(`Books suitable for age group ${readerId}:`);
-        console.log(recommendations);
-        console.log("ALL BOOKS "+allBooks);
-
         const output = { suggestions: recommendations };
 
         await driverConnection.close();
