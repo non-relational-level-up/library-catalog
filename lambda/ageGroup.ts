@@ -30,6 +30,7 @@ export const handler: APIGatewayProxyHandler = async (event) => {
 
         console.log(`Books suitable for age group ${readerId}:`);
         console.log(recommendations);
+        console.log("ALL BOOKS "+allBooks);
 
         const output = { suggestions: recommendations };
 
