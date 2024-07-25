@@ -144,12 +144,12 @@ export class LibraryCatalogueStack extends cdk.Stack {
             entry: path.join(lambdaAppDir, 'suggestion_books_by_series.ts'),
         });
 
-        const ageGroupLambda = createLambda('age-group-lambda', {
-            entry: path.join(lambdaAppDir, 'ageGroup.ts'),
+        const suggestionBooksByPastBooksLambda = createLambda('suggestion-books-by-past-books-lambda', {
+            entry: path.join(lambdaAppDir, 'suggestion_books_by_past_books.ts'),
         });
 
-        const suggestionLambda = createLambda('suggestions', {
-            entry: path.join(lambdaAppDir, 'suggestions.ts'),
+        const ageGroupLambda = createLambda('age-group-lambda', {
+            entry: path.join(lambdaAppDir, 'ageGroup.ts'),
         });
 
         const addBookLambda = createLambda('add-book-lambda', {
@@ -185,8 +185,7 @@ export class LibraryCatalogueStack extends cdk.Stack {
         apiResource.addResource('reader-to-book').addMethod(HttpMethod.POST, new LambdaIntegration(createReaderToBookLambda));
         suggestResource.addResource('genre').addResource('{userId}').addMethod(HttpMethod.GET, new LambdaIntegration(suggestionBooksByGenreLambda))
         suggestResource.addResource('series').addResource('{userId}').addMethod(HttpMethod.GET, new LambdaIntegration(suggestionBooksBySeriesLambda))        
-        
-        apiResource.addResource('suggestions').addMethod(HttpMethod.GET, new LambdaIntegration(suggestionLambda));
+        suggestResource.addResource('past-books').addResource('{userId}').addMethod(HttpMethod.GET, new LambdaIntegration(suggestionBooksByPastBooksLambda));
         
         apiResource.addResource('ageGroup').addResource('{ageGroup}').addMethod(HttpMethod.GET, new LambdaIntegration(ageGroupLambda));
 
