@@ -1,32 +1,21 @@
 import { type APIGatewayProxyHandler } from 'aws-lambda';
 import { getNeptuneConnection } from '../utils/dbUtils';
 import * as gremlin from 'gremlin';
-const __ = gremlin.process.statics;
 
 export const handler: APIGatewayProxyHandler = async (event) => {
     const {driverConnection, graph} = getNeptuneConnection();
     const statics = gremlin.process.statics;
     const P = gremlin.process.P;
 
-    const username = event.pathParameters?.username || '';
-    if (!username) {
+    const readerId = event.pathParameters?.userId || '';
+    if (!readerId) {
         return {
             statusCode: 400,
-            body: JSON.stringify({ message: 'Username is required' }),
+            body: JSON.stringify({ message: 'Reader id is required' }),
         };
     }
 
     try {
-        //const username = "wandile";
-        const reader = await graph.V()
-            .hasLabel("Reader")
-            .has("username", username)
-            .next();
-
-            
-        console.log("reader: " + JSON.stringify(reader));
-        console.log("reader.value: " + reader.value);
-        const readerId = reader.value;
 
         const readBooks = await graph.V(readerId)
             .outE("has-read")
@@ -35,9 +24,9 @@ export const handler: APIGatewayProxyHandler = async (event) => {
             .by(statics.unfold())
             .toList();
 
-        //console.log("============================");
-        //console.log(readBooks);
-        //console.log("============================");
+        console.log("============================");
+        console.log(readBooks);
+        console.log("============================");
 
         // Suggest books based on similar readers' interests
         const suggestedBooks = await graph.V(readerId)
@@ -45,7 +34,7 @@ export const handler: APIGatewayProxyHandler = async (event) => {
                 .in_("has-read")                 // Other readers who read the same books
                 .out()                           // Books read by these other readers
                 .dedup()                         // Remove duplicate books
-                .where(__.not(__.in_("has-read").hasId(readerId)))  // Exclude books already read by the current reader
+                .where(statics.not(statics.in_("has-read").hasId(readerId)))  // Exclude books already read by the current reader
                 .limit(3)
                 .project("title")
                 .by("title")
