@@ -7,7 +7,7 @@ export const handler: APIGatewayProxyHandler = async (event) => {
     const statics = gremlin.process.statics;
     const P = gremlin.process.P;
 
-    const readerId = event.pathParameters?.userId || '';
+    const readerId = event.pathParameters?.readerId || '';
     if (!readerId) {
         return {
             statusCode: 400,
