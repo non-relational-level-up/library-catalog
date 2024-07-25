@@ -15,33 +15,29 @@ export const handler: APIGatewayProxyHandler = async (event) => {
     }
 
     try {
+        const allBooks = await graph.V(readerId)
+            .out().hasLabel('Book')
+            .out().hasLabel('AgeGroup')
+            .in_().hasLabel('Book')
+            .where(statics.not(statics.in_("has-read").hasId(readerId)))
+            .dedup()
+            .limit(50)
+            .values('title')
+            .toList();
 
-        const books = await graph.V(readerId).out().hasLabel('Book').out().hasLabel('AgeGroup').in_().hasLabel('Book').where(statics.not(statics.in_("has-read").hasId(readerId))).dedup().limit(3).values('title').toList();
-
-        // const books = await graph.V()
-        //     .hasLabel("AgeGroup")
-        //     .has("ageGroup", ageGroup)
-        //     .in_("suitable-for")
-        //     .dedup()
-        //     .limit(3)
-        //     .project("title", "publicationYear")
-        //     .by("title")
-        //     .by("publicationYear")
-        //     .toList();
+        const shuffledBooks = allBooks.sort(() => 0.5 - Math.random());
+        const recommendations = shuffledBooks.slice(0, 3);
 
         console.log(`Books suitable for age group ${readerId}:`);
-        console.log(books);
-        const output = { suggestions: books}
+        console.log(recommendations);
 
-        // const titles = books.map((book: any) => book.get("title"));
-
-        // console.log("Titless: "+JSON.stringify(titles, null, 1));
+        const output = { suggestions: recommendations };
 
         await driverConnection.close();
 
         return {
             statusCode: 200,
-            body:JSON.stringify(output),
+            body: JSON.stringify(output),
         };
     } catch (e) {
         await driverConnection.close();
