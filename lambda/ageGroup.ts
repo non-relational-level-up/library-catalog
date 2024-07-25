@@ -5,28 +5,38 @@ import * as gremlin from 'gremlin';
 export const handler: APIGatewayProxyHandler = async (event) => {
     const { driverConnection, graph } = getNeptuneConnection();
     const statics = gremlin.process.statics;
-    const ageGroup = event.pathParameters?.ageGroup || '';
+    // const ageGroup = event.pathParameters?.ageGroup || '';
 
-    if (!ageGroup) {
-        return {
-            statusCode: 400,
-            body: JSON.stringify({ message: 'Age group parameter is required' }),
-        };
-    }
+    // if (!ageGroup) {
+    //     return {
+    //         statusCode: 400,
+    //         body: JSON.stringify({ message: 'Age group parameter is required' }),
+    //     };
+    // }
 
     try {
-        const books = await graph.V()
-            .hasLabel("AgeGroup")
-            .has("ageGroup", ageGroup)
-            .in_("suitable-for")
-            .dedup()
-            .limit(3)
-            .project("title", "publicationYear")
-            .by("title")
-            .by("publicationYear")
-            .toList();
+        const readerId = event.pathParameters?.userId;
+        // const books = await graph.V()
+        //     .hasLabel("AgeGroup")
+        //     .has("ageGroup", ageGroup)
+        //     .in_("suitable-for")
+        //     .dedup()
+        //     .limit(3)
+        //     .project("title", "publicationYear")
+        //     .by("title")
+        //     .by("publicationYear")
+        //     .toList();
+        const books = await graph.V(readerId).out().hasLabel('Book').out()
+        .hasLabel("AgeGroup")
+        .in_("suitable-for")
+        .dedup()
+        .limit(3)
+        .project("title", "publicationYear")
+        .by("title")
+        .by("publicationYear")
+        .toList();
 
-        console.log(`Books suitable for age group ${ageGroup}:`);
+        console.log(`Books suitable for age group ${readerId}:`);
         console.log(books);
 
         const titles = books.map((book: any) => book.get("title"));
