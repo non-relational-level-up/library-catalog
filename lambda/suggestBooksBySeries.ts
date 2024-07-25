@@ -7,7 +7,7 @@ export const handler: APIGatewayProxyHandler = async (event) => {
     const statics = gremlin.process.statics;
 
     try {
-        const readerId = event.pathParameters?.userId;
+        const readerId = event.pathParameters?.readerId;
         const books = await graph.V(readerId)
                 .out()
                 .hasLabel('Book')

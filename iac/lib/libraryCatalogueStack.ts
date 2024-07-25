@@ -187,10 +187,10 @@ export class LibraryCatalogueStack extends cdk.Stack {
         apiResource.addResource('reader-to-book').addMethod(HttpMethod.POST, new LambdaIntegration(createReaderToBookLambda));
         apiResource.addResource('book').addMethod(HttpMethod.POST, new LambdaIntegration(addBookLambda));
         
-        suggestResource.addResource('genre').addResource('{userId}').addMethod(HttpMethod.GET, new LambdaIntegration(suggestionBooksByGenreLambda))
-        suggestResource.addResource('series').addResource('{userId}').addMethod(HttpMethod.GET, new LambdaIntegration(suggestionBooksBySeriesLambda))
-        suggestResource.addResource('past-books').addResource('{userId}').addMethod(HttpMethod.GET, new LambdaIntegration(suggestionBooksByPastBooksLambda));
-        suggestResource.addResource('ageGroup').addResource('{ageGroup}').addMethod(HttpMethod.GET, new LambdaIntegration(ageGroupLambda));
+        suggestResource.addResource('genre').addResource('{readerId}').addMethod(HttpMethod.GET, new LambdaIntegration(suggestionBooksByGenreLambda))
+        suggestResource.addResource('series').addResource('{readerId}').addMethod(HttpMethod.GET, new LambdaIntegration(suggestionBooksBySeriesLambda))
+        suggestResource.addResource('past-books').addResource('{readerId}').addMethod(HttpMethod.GET, new LambdaIntegration(suggestionBooksByPastBooksLambda));
+        suggestResource.addResource('ageGroup').addResource('{readerId}').addMethod(HttpMethod.GET, new LambdaIntegration(ageGroupLambda));
     }
     
 }
