@@ -185,7 +185,13 @@ export class LibraryCatalogueStack extends cdk.Stack {
             }
         });
 
-        api.deploymentStage.addApiKey(`${appName}-api-key`);
+        const usagePlan = api.addUsagePlan('api-usage-plan', {
+            name: 'API usage plan',
+            apiStages: [{api, stage: api.deploymentStage}]
+        });
+
+        const apiKey = api.addApiKey(`${appName}-api-key`);
+        usagePlan.addApiKey(apiKey);
 
         const createReaderRequestModel = new Model(this, 'create-reader-request-model', {
             restApi: api,
