@@ -31,16 +31,17 @@ export const handler: APIGatewayProxyHandler = async (event) => {
 
         console.log(`Books suitable for age group ${readerId}:`);
         console.log(books);
+        const output = { suggestions: books}
 
-        const titles = books.map((book: any) => book.get("title"));
+        // const titles = books.map((book: any) => book.get("title"));
 
-        console.log("Titless: "+JSON.stringify(titles, null, 1));
+        // console.log("Titless: "+JSON.stringify(titles, null, 1));
 
         await driverConnection.close();
 
         return {
             statusCode: 200,
-            body:JSON.stringify(titles, null, 1),
+            body:JSON.stringify(output),
         };
     } catch (e) {
         await driverConnection.close();
