@@ -39,22 +39,17 @@ export const handler: APIGatewayProxyHandler = async (event) => {
                 body: JSON.stringify({ message: 'Book already exists' }),
             };
         }
-        // Add or find author vertex
+
         const authorVertex = await findOrCreateVertex('Author', 'fullName', authorName);
 
-        // Add or find book vertex
         const bookVertex = await findOrCreateVertex('Book', 'title', title);
-        
-        // Add or find genre vertex
+
         const genreVertex = await findOrCreateVertex('Genre', 'name', genre);
 
-        // Add or find series vertex
         const seriesVertex = await findOrCreateVertex('Series', 'name', series);
 
-        // Add or find age group vertex
         const ageGroupVertex = await findOrCreateVertex('AgeGroup', 'ageGroup', ageGroup);
 
-        // Create edges
         await graph.V(authorVertex.value.id).as('a')
             .V(bookVertex.value.id).as('b')
             .addE('wrote').from_('a').to('b').next();
