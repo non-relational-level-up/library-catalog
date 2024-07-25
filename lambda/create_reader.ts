@@ -7,7 +7,7 @@ export const handler: APIGatewayProxyHandler = async (event) => {
     const statics = gremlin.process.statics;
 
     try {
-        const { userName} = JSON.parse(event.body || '{}');
+        const { userName } = JSON.parse(event.body || '{}');
         const user = await graph.addV('Reader').property('name', userName);
         await driverConnection.close();
         const output = { user: user }
