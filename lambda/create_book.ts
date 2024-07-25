@@ -25,6 +25,20 @@ export const handler: APIGatewayProxyHandler = async (event) => {
             return vertex;
         };
 
+        const findBook = async (label: string, property: string, value: string) => {
+            let vertex = await graph.V().has(label, property, value).next();
+            if (vertex.value) {
+                return true;
+            }
+            return false;
+        };
+
+        if (await findBook('Book','title',title)==true){
+            return {
+                statusCode: 400,
+                body: JSON.stringify({ message: 'Book already exists' }),
+            };
+        }
         // Add or find author vertex
         const authorVertex = await findOrCreateVertex('Author', 'fullName', authorName);
 
