@@ -16,7 +16,7 @@ export const handler: APIGatewayProxyHandler = async (event) => {
                 body: JSON.stringify("Relationship already exists")
             };
         } else {
-            const relationship = await graph.addE('has-read').from_(reader).to(book).next();
+            const relationship = await graph.addE('has-read').from_(statics.V(reader)).to(statics.V(book)).next();
             await driverConnection.close();
             const output = { relationships: relationship}
             console.log(output);
