@@ -23,28 +23,21 @@ export const handler: APIGatewayProxyHandler = async (event) => {
             .limit(3)
             .project("title", "publicationYear")
             .by("title")
+            .by("publicationYear")
             .toList();
 
         console.log(`Books suitable for age group ${ageGroup}:`);
         console.log(books);
 
+        const titles = books.map((book: any) => book.get("title"));
 
-        const jsonBooks = books.reduce((acc: any[], book: any) => {
-            const obj: { [key: string]: any } = {};
-            book.forEach((value: any, key: any) => {
-                obj[key] = value;
-            });
-            acc.push(obj);
-            return acc;
-        }, []);
+        console.log("Titless: "+JSON.stringify(titles, null, 1));
 
-        console.log(JSON.stringify(jsonBooks, null, 2));
-                
         await driverConnection.close();
 
         return {
             statusCode: 200,
-            body: JSON.stringify(jsonBooks, null, 2),
+            body:JSON.stringify(titles, null, 1),
         };
     } catch (e) {
         await driverConnection.close();
