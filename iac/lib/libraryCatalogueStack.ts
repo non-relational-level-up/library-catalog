@@ -1,5 +1,5 @@
 import * as cdk from 'aws-cdk-lib';
-import {aws_ec2, Duration} from 'aws-cdk-lib';
+import {Duration} from 'aws-cdk-lib';
 import {Construct} from 'constructs';
 import {GitHubStackProps} from './githubStackProps';
 import {
@@ -19,20 +19,7 @@ import {Runtime} from 'aws-cdk-lib/aws-lambda';
 import {Cors, LambdaIntegration, RestApi} from 'aws-cdk-lib/aws-apigateway';
 import * as path from 'path';
 import {HttpMethod} from 'aws-cdk-lib/aws-apigatewayv2';
-import {
-    GatewayVpcEndpointAwsService,
-    Instance,
-    InstanceClass,
-    InstanceSize,
-    KeyPair,
-    KeyPairType,
-    MachineImage,
-    Peer,
-    Port,
-    SecurityGroup,
-    SubnetType,
-    Vpc
-} from 'aws-cdk-lib/aws-ec2';
+import {GatewayVpcEndpointAwsService, SubnetType, Vpc} from 'aws-cdk-lib/aws-ec2';
 import {Bucket} from 'aws-cdk-lib/aws-s3';
 
 export class LibraryCatalogueStack extends cdk.Stack {
@@ -117,23 +104,6 @@ export class LibraryCatalogueStack extends cdk.Stack {
             bucketName: 'library-catalogue-bucket',
         });
 
-        //EC2
-        const ec2Sg = new SecurityGroup(this, 'ec2-sg', {
-            vpc: vpc,
-            allowAllOutbound: true
-        });
-
-        ec2Sg.addIngressRule(Peer.anyIpv4(), Port.tcp(22));
-
-        const ec2Instance = new Instance(this, 'scratch-pad-ec2', {
-            vpc: vpc,
-            instanceType: aws_ec2.InstanceType.of(InstanceClass.T3, InstanceSize.MICRO),
-            machineImage: MachineImage.latestAmazonLinux2023(),
-            keyPair: new KeyPair(this, 'ec2-key-pair', {keyPairName: 'ec2-key-pair', type: KeyPairType.RSA}),
-            securityGroup: ec2Sg,
-        });
-
-
         // Lambdas
         const lambdaEnv = {
             'DB_ADDRESS': neptuneCluster.clusterEndpoint.socketAddress,
@@ -174,6 +144,14 @@ export class LibraryCatalogueStack extends cdk.Stack {
             entry: path.join(lambdaAppDir, 'suggestion_books_by_series.ts'),
         });
 
+        const ageGroupLambda = createLambda('age-group-lambda', {
+            entry: path.join(lambdaAppDir, 'ageGroup.ts'),
+        });
+
+        const suggestionLambda = createLambda('suggestions', {
+            entry: path.join(lambdaAppDir, 'suggestions.ts'),
+        });
+
         // API
         const api = new RestApi(this, `${appName}-api-gateway`, {
             deployOptions: {stageName: 'prod'},
@@ -192,6 +170,11 @@ export class LibraryCatalogueStack extends cdk.Stack {
         apiResource.addResource('genre').addResource('{genre}').addMethod(HttpMethod.GET, new LambdaIntegration(booksByGenreLambda))
         apiResource.addResource('series').addResource('{series}').addMethod(HttpMethod.GET, new LambdaIntegration(booksBySeriesLambda))
         suggestResource.addResource('genre').addResource('{userId}').addMethod(HttpMethod.GET, new LambdaIntegration(suggestionBooksByGenreLambda))
-        suggestResource.addResource('series').addResource('{userId}').addMethod(HttpMethod.GET, new LambdaIntegration(suggestionBooksBySeriesLambda))
+        suggestResource.addResource('series').addResource('{userId}').addMethod(HttpMethod.GET, new LambdaIntegration(suggestionBooksBySeriesLambda))        
+        
+        apiResource.addResource('suggestions').addMethod(HttpMethod.GET, new LambdaIntegration(suggestionLambda));
+        
+        apiResource.addResource('ageGroup').addResource('{ageGroup}').addMethod(HttpMethod.GET, new LambdaIntegration(ageGroupLambda));
+
     }
 }
