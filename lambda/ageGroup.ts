@@ -29,16 +29,6 @@ export const handler: APIGatewayProxyHandler = async (event) => {
         console.log(`Books suitable for age group ${ageGroup}:`);
         console.log(books);
 
-
-        // const jsonBooks = books.reduce((acc: any[], book: any) => {
-        //     const obj: { [key: string]: any } = {};
-        //     book.forEach((value: any, key: any) => {
-        //         obj[key] = value;
-        //     });
-        //     acc.push(obj);
-        //     return acc;
-        // }, []);
-
         const titles = books.map((book: any) => book.get("title"));
 
         console.log("Titless: "+JSON.stringify(titles, null, 1));
