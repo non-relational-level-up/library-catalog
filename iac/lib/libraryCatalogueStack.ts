@@ -152,6 +152,10 @@ export class LibraryCatalogueStack extends cdk.Stack {
             entry: path.join(lambdaAppDir, 'suggestions.ts'),
         });
 
+        const addBookLambda = createLambda('add-book-lambda', {
+            entry: path.join(lambdaAppDir, 'create_book.ts'),
+        });
+
         // API
         const api = new RestApi(this, `${appName}-api-gateway`, {
             deployOptions: {stageName: 'prod'},
@@ -176,5 +180,7 @@ export class LibraryCatalogueStack extends cdk.Stack {
         
         apiResource.addResource('ageGroup').addResource('{ageGroup}').addMethod(HttpMethod.GET, new LambdaIntegration(ageGroupLambda));
 
+        apiResource.addResource('addBook').addMethod(HttpMethod.POST, new LambdaIntegration(addBookLambda));
     }
+    
 }
