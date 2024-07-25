@@ -5,17 +5,19 @@ import * as gremlin from 'gremlin';
 export const handler: APIGatewayProxyHandler = async (event) => {
     const { driverConnection, graph } = getNeptuneConnection();
     const statics = gremlin.process.statics;
-    // const ageGroup = event.pathParameters?.ageGroup || '';
+    const readerId = event.pathParameters?.ageGroup || '';
 
-    // if (!ageGroup) {
-    //     return {
-    //         statusCode: 400,
-    //         body: JSON.stringify({ message: 'Age group parameter is required' }),
-    //     };
-    // }
+    if (!readerId) {
+        return {
+            statusCode: 400,
+            body: JSON.stringify({ message: 'Age group parameter is required' }),
+        };
+    }
 
     try {
-        const readerId = event.pathParameters?.userId;
+
+        const books = await graph.V(readerId).out().hasLabel('Book').out().hasLabel('AgeGroup').in_().hasLabel('Book').where(statics.not(statics.in_("has-read").hasId(readerId))).dedup().limit(3).values('title').toList();
+
         // const books = await graph.V()
         //     .hasLabel("AgeGroup")
         //     .has("ageGroup", ageGroup)
@@ -26,15 +28,6 @@ export const handler: APIGatewayProxyHandler = async (event) => {
         //     .by("title")
         //     .by("publicationYear")
         //     .toList();
-        const books = await graph.V(readerId).out().hasLabel('Book').out()
-        .hasLabel("AgeGroup")
-        .in_("suitable-for")
-        .dedup()
-        .limit(3)
-        .project("title", "publicationYear")
-        .by("title")
-        .by("publicationYear")
-        .toList();
 
         console.log(`Books suitable for age group ${readerId}:`);
         console.log(books);
