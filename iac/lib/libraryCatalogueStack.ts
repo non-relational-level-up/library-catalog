@@ -148,16 +148,20 @@ export class LibraryCatalogueStack extends cdk.Stack {
             entry: path.join(lambdaAppDir, 'suggestion_books_by_past_books.ts'),
         });
 
+        const ageGroupLambda = createLambda('age-group-lambda', {
+            entry: path.join(lambdaAppDir, 'ageGroup.ts'),
+        });
+
+        const addBookLambda = createLambda('add-book-lambda', {
+            entry: path.join(lambdaAppDir, 'create_book.ts'),
+        });
+        
         const createReaderLambda = createLambda('create-reader-lambda', {
             entry: path.join(lambdaAppDir, 'create_reader.ts'),
         });
 
         const createReaderToBookLambda = createLambda('create-reader-to-book-lambda', {
             entry: path.join(lambdaAppDir, 'create_reader_to_book.ts'),
-        });
-
-        const ageGroupLambda = createLambda('age-group-lambda', {
-            entry: path.join(lambdaAppDir, 'ageGroup.ts'),
         });
 
         // API
@@ -185,5 +189,7 @@ export class LibraryCatalogueStack extends cdk.Stack {
         
         apiResource.addResource('ageGroup').addResource('{ageGroup}').addMethod(HttpMethod.GET, new LambdaIntegration(ageGroupLambda));
 
+        apiResource.addResource('addBook').addMethod(HttpMethod.POST, new LambdaIntegration(addBookLambda));
     }
+    
 }
