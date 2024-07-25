@@ -9,6 +9,7 @@ export const handler: APIGatewayProxyHandler = async (event) => {
     try {
         const { book, reader} = JSON.parse(event.body || '{}');
         const existing = await graph.V(reader).out('has-read').hasId(book).values('title').toList();
+        console.log(existing);
         if (existing.length == 0){
             return {
                 statusCode: 200,
