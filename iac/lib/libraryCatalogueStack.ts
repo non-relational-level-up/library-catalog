@@ -144,15 +144,15 @@ export class LibraryCatalogueStack extends cdk.Stack {
             entry: path.join(lambdaAppDir, 'suggestion_books_by_series.ts'),
         });
 
+        const suggestionBooksByPastBooksLambda = createLambda('suggestion-books-by-past-books-lambda', {
+            entry: path.join(lambdaAppDir, 'suggestion_books_by_past_books.ts'),
+        });
+
         const createReaderLambda = createLambda('create-reader-lambda', {
             entry: path.join(lambdaAppDir, 'create_reader.ts'),
         });
 
         const createReaderToBookLambda = createLambda('create-reader-to-book-lambda', {
-            entry: path.join(lambdaAppDir, 'create_reader_to_book.ts'),
-        });
-
-        const suggestionBooksByPastBooksLambda = createLambda('create-reader-to-book-lambda', {
             entry: path.join(lambdaAppDir, 'create_reader_to_book.ts'),
         });
 
