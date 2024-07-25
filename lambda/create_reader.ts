@@ -8,7 +8,7 @@ export const handler: APIGatewayProxyHandler = async (event) => {
 
     try {
         const { userName } = JSON.parse(event.body || '{}');
-        const user = await graph.addV('Reader').property('name', userName);
+        const user = await graph.addV('Reader').property('name', userName).next();
         await driverConnection.close();
         const output = { user: user }
         console.log(output);
