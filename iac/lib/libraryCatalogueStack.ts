@@ -16,7 +16,15 @@ import {
 import {NodejsFunction, NodejsFunctionProps} from 'aws-cdk-lib/aws-lambda-nodejs';
 import {DatabaseCluster, InstanceType} from '@aws-cdk/aws-neptune-alpha';
 import {Runtime} from 'aws-cdk-lib/aws-lambda';
-import {ApiKeySourceType, Cors, LambdaIntegration, RestApi} from 'aws-cdk-lib/aws-apigateway';
+import {
+    ApiKeySourceType,
+    Cors,
+    JsonSchemaType,
+    LambdaIntegration,
+    Model,
+    RequestValidator,
+    RestApi
+} from 'aws-cdk-lib/aws-apigateway';
 import * as path from 'path';
 import {HttpMethod} from 'aws-cdk-lib/aws-apigatewayv2';
 import {GatewayVpcEndpointAwsService, SubnetType, Vpc} from 'aws-cdk-lib/aws-ec2';
@@ -176,15 +184,79 @@ export class LibraryCatalogueStack extends cdk.Stack {
 
         api.deploymentStage.addApiKey(`${appName}-api-key`);
 
+        const createReaderRequestModel = new Model(this, 'create-reader-request-model', {
+            restApi: api,
+            schema: {
+                additionalProperties: false,
+                type: JsonSchemaType.OBJECT,
+                required: ['readerName'],
+                properties: {
+                    readerName: {type: JsonSchemaType.STRING}
+                }
+            }
+        });
+
+        const createBookRequestModel = new Model(this, 'create-book-request-model', {
+            restApi: api,
+            schema: {
+                additionalProperties: false,
+                type: JsonSchemaType.OBJECT,
+                required: ['title', 'publicationYear', 'authorName', 'genre', 'series', 'ageGroup'],
+                properties: {
+                    title: {type: JsonSchemaType.STRING},
+                    publicationYear: {type: JsonSchemaType.STRING},
+                    authorName: {type: JsonSchemaType.STRING},
+                    genre: {type: JsonSchemaType.STRING},
+                    series: {type: JsonSchemaType.STRING},
+                    ageGroup: {type: JsonSchemaType.STRING}
+                }
+            }
+        });
+
+        const createReaderToBookRequestModel = new Model(this, 'create-reader-to-book-request-model', {
+            restApi: api,
+            schema: {
+                additionalProperties: false,
+                type: JsonSchemaType.OBJECT,
+                required: ['reader', 'book'],
+                properties: {
+                    reader: {type: JsonSchemaType.STRING},
+                    book: {type: JsonSchemaType.STRING}
+                }
+            }
+        });
+
+        const requestValidator = new RequestValidator(this, 'api-request-validator', {
+            restApi: api,
+            validateRequestBody: true
+        });
+
+
         const apiResource = api.root.addResource('api');
         const suggestResource = apiResource.addResource('suggest');
 
         apiResource.addResource('genre').addResource('{genre}').addMethod(HttpMethod.GET, new LambdaIntegration(booksByGenreLambda));
         apiResource.addResource('series').addResource('{series}').addMethod(HttpMethod.GET, new LambdaIntegration(booksBySeriesLambda));
 
-        apiResource.addResource('reader').addMethod(HttpMethod.POST, new LambdaIntegration(createReaderLambda));
-        apiResource.addResource('reader-to-book').addMethod(HttpMethod.POST, new LambdaIntegration(createReaderToBookLambda));
-        apiResource.addResource('book').addMethod(HttpMethod.POST, new LambdaIntegration(addBookLambda));
+        apiResource.addResource('reader').addMethod(HttpMethod.POST, new LambdaIntegration(createReaderLambda), {
+            requestValidator: requestValidator,
+            requestModels: {
+                'application/json': createReaderRequestModel
+            }
+        });
+
+        apiResource.addResource('reader-to-book').addMethod(HttpMethod.POST, new LambdaIntegration(createReaderToBookLambda), {
+            requestValidator: requestValidator, requestModels: {
+                'application/json': createReaderToBookRequestModel
+            }
+        });
+
+        apiResource.addResource('book').addMethod(HttpMethod.POST, new LambdaIntegration(addBookLambda), {
+            requestValidator: requestValidator,
+            requestModels: {
+                'application/json': createBookRequestModel
+            }
+        });
 
         suggestResource.addResource('genre').addResource('{readerId}').addMethod(HttpMethod.GET, new LambdaIntegration(suggestionBooksByGenreLambda));
         suggestResource.addResource('series').addResource('{readerId}').addMethod(HttpMethod.GET, new LambdaIntegration(suggestionBooksBySeriesLambda));
