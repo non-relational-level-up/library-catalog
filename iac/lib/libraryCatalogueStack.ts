@@ -16,7 +16,7 @@ import {
 import {NodejsFunction, NodejsFunctionProps} from 'aws-cdk-lib/aws-lambda-nodejs';
 import {DatabaseCluster, InstanceType} from '@aws-cdk/aws-neptune-alpha';
 import {Runtime} from 'aws-cdk-lib/aws-lambda';
-import {ApiKey, ApiKeySourceType, Cors, LambdaIntegration, RestApi} from 'aws-cdk-lib/aws-apigateway';
+import {ApiKeySourceType, Cors, LambdaIntegration, RestApi} from 'aws-cdk-lib/aws-apigateway';
 import * as path from 'path';
 import {HttpMethod} from 'aws-cdk-lib/aws-apigatewayv2';
 import {GatewayVpcEndpointAwsService, SubnetType, Vpc} from 'aws-cdk-lib/aws-ec2';
@@ -151,7 +151,7 @@ export class LibraryCatalogueStack extends cdk.Stack {
         const addBookLambda = createLambda('add-book-lambda', {
             entry: path.join(lambdaAppDir, 'createBook.ts'),
         });
-        
+
         const createReaderLambda = createLambda('create-reader-lambda', {
             entry: path.join(lambdaAppDir, 'createReader.ts'),
         });
@@ -161,8 +161,7 @@ export class LibraryCatalogueStack extends cdk.Stack {
         });
 
         // API
-        const apiKey = new ApiKey(this, `${appName}-api-key`);
-        
+
         const api = new RestApi(this, `${appName}-api-gateway`, {
             deployOptions: {stageName: 'prod'},
             restApiName: `${appName}-api`,
@@ -174,23 +173,23 @@ export class LibraryCatalogueStack extends cdk.Stack {
             },
             apiKeySourceType: ApiKeySourceType.HEADER,
         });
-        
-        api.addApiKey(apiKey.keyId);
-        
+
+        api.deploymentStage.addApiKey(`${appName}-api-key`);
+
         const apiResource = api.root.addResource('api');
         const suggestResource = apiResource.addResource('suggest');
 
-        apiResource.addResource('genre').addResource('{genre}').addMethod(HttpMethod.GET, new LambdaIntegration(booksByGenreLambda))
-        apiResource.addResource('series').addResource('{series}').addMethod(HttpMethod.GET, new LambdaIntegration(booksBySeriesLambda))
-        
+        apiResource.addResource('genre').addResource('{genre}').addMethod(HttpMethod.GET, new LambdaIntegration(booksByGenreLambda));
+        apiResource.addResource('series').addResource('{series}').addMethod(HttpMethod.GET, new LambdaIntegration(booksBySeriesLambda));
+
         apiResource.addResource('reader').addMethod(HttpMethod.POST, new LambdaIntegration(createReaderLambda));
         apiResource.addResource('reader-to-book').addMethod(HttpMethod.POST, new LambdaIntegration(createReaderToBookLambda));
         apiResource.addResource('book').addMethod(HttpMethod.POST, new LambdaIntegration(addBookLambda));
-        
-        suggestResource.addResource('genre').addResource('{readerId}').addMethod(HttpMethod.GET, new LambdaIntegration(suggestionBooksByGenreLambda))
-        suggestResource.addResource('series').addResource('{readerId}').addMethod(HttpMethod.GET, new LambdaIntegration(suggestionBooksBySeriesLambda))
+
+        suggestResource.addResource('genre').addResource('{readerId}').addMethod(HttpMethod.GET, new LambdaIntegration(suggestionBooksByGenreLambda));
+        suggestResource.addResource('series').addResource('{readerId}').addMethod(HttpMethod.GET, new LambdaIntegration(suggestionBooksBySeriesLambda));
         suggestResource.addResource('past-books').addResource('{readerId}').addMethod(HttpMethod.GET, new LambdaIntegration(suggestionBooksByPastBooksLambda));
         suggestResource.addResource('ageGroup').addResource('{readerId}').addMethod(HttpMethod.GET, new LambdaIntegration(ageGroupLambda));
     }
-    
+
 }
