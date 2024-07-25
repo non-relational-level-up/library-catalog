@@ -152,6 +152,18 @@ export class LibraryCatalogueStack extends cdk.Stack {
             entry: path.join(lambdaAppDir, 'suggestions.ts'),
         });
 
+        const addBookLambda = createLambda('add-book-lambda', {
+            entry: path.join(lambdaAppDir, 'create_book.ts'),
+        });
+        
+        const createReaderLambda = createLambda('create-reader-lambda', {
+            entry: path.join(lambdaAppDir, 'create_reader.ts'),
+        });
+
+        const createReaderToBookLambda = createLambda('create-reader-to-book-lambda', {
+            entry: path.join(lambdaAppDir, 'create_reader_to_book.ts'),
+        });
+
         // API
         const api = new RestApi(this, `${appName}-api-gateway`, {
             deployOptions: {stageName: 'prod'},
@@ -169,6 +181,8 @@ export class LibraryCatalogueStack extends cdk.Stack {
         apiResource.addResource('hello').addMethod(HttpMethod.GET, new LambdaIntegration(helloLambda));
         apiResource.addResource('genre').addResource('{genre}').addMethod(HttpMethod.GET, new LambdaIntegration(booksByGenreLambda))
         apiResource.addResource('series').addResource('{series}').addMethod(HttpMethod.GET, new LambdaIntegration(booksBySeriesLambda))
+        apiResource.addResource('reader').addMethod(HttpMethod.POST, new LambdaIntegration(createReaderLambda));
+        apiResource.addResource('reader-to-book').addMethod(HttpMethod.POST, new LambdaIntegration(createReaderToBookLambda));
         suggestResource.addResource('genre').addResource('{userId}').addMethod(HttpMethod.GET, new LambdaIntegration(suggestionBooksByGenreLambda))
         suggestResource.addResource('series').addResource('{userId}').addMethod(HttpMethod.GET, new LambdaIntegration(suggestionBooksBySeriesLambda))        
         
@@ -176,5 +190,7 @@ export class LibraryCatalogueStack extends cdk.Stack {
         
         apiResource.addResource('ageGroup').addResource('{ageGroup}').addMethod(HttpMethod.GET, new LambdaIntegration(ageGroupLambda));
 
+        apiResource.addResource('addBook').addMethod(HttpMethod.POST, new LambdaIntegration(addBookLambda));
     }
+    
 }
