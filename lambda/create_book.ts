@@ -1,10 +1,9 @@
 import { APIGatewayProxyHandler } from 'aws-lambda';
 import { getNeptuneConnection } from '../utils/dbUtils';
-import * as gremlin from 'gremlin';
+import axios from 'axios';
 
 export const handler: APIGatewayProxyHandler = async (event) => {
-    const { driverConnection, graph } = getNeptuneConnection();
-    const statics = gremlin.process.statics;
+    const { sparqlEndpoint } = getNeptuneConnection();
 
     const { title, publicationYear, authorName, genre, series, ageGroup } = JSON.parse(event.body || '{}');
 
@@ -16,66 +15,82 @@ export const handler: APIGatewayProxyHandler = async (event) => {
     }
 
     try {
-        // Function to find or create a vertex
-        const findOrCreateVertex = async (label: string, property: string, value: string) => {
-            let vertex = await graph.V().has(label, property, value).next();
-            if (!vertex.value) {
-                vertex = await graph.addV(label).property(property, value).next();
-            }
-            return vertex;
+        // Function to check if a vertex exists
+        const checkIfExists = async (label: string, property: string, value: string) => {
+            const query = `
+                PREFIX ex: <http://example.org/>
+                ASK WHERE {
+                    ?s a ex:${label} ;
+                       ex:${property} "${value}" .
+                }
+            `;
+            const response = await axios.post(sparqlEndpoint, `query=${encodeURIComponent(query)}`, {
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            });
+            return response.data.boolean;
         };
 
-        const findBook = async (label: string, property: string, value: string) => {
-            let vertex = await graph.V().has(label, property, value).next();
-            if (vertex.value) {
-                return true;
-            }
-            return false;
+        // Function to insert a vertex
+        const insertVertex = async (label: string, properties: { [key: string]: string }) => {
+            const propString = Object.entries(properties)
+                .map(([key, value]) => `ex:${key} "${value}"`)
+                .join(' ; ');
+            const query = `
+                PREFIX ex: <http://example.org/>
+                INSERT DATA {
+                    _:new a ex:${label} ;
+                         ${propString} .
+                }
+            `;
+            await axios.post(sparqlEndpoint, `update=${encodeURIComponent(query)}`, {
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            });
         };
 
-        if (await findBook('Book','title',title)==true){
+        // Function to insert an edge
+        const insertEdge = async (fromLabel: string, fromProperty: string, fromValue: string, toLabel: string, toProperty: string, toValue: string, edgeLabel: string) => {
+            const query = `
+                PREFIX ex: <http://example.org/>
+                INSERT {
+                    ?from ex:${edgeLabel} ?to .
+                }
+                WHERE {
+                    ?from a ex:${fromLabel} ;
+                          ex:${fromProperty} "${fromValue}" .
+                    ?to a ex:${toLabel} ;
+                        ex:${toProperty} "${toValue}" .
+                }
+            `;
+            await axios.post(sparqlEndpoint, `update=${encodeURIComponent(query)}`, {
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            });
+        };
+
+        if (await checkIfExists('Book', 'title', title)) {
             return {
                 statusCode: 400,
                 body: JSON.stringify({ message: 'Book already exists' }),
             };
         }
 
-        const authorVertex = await findOrCreateVertex('Author', 'fullName', authorName);
+        await insertVertex('Author', { fullName: authorName });
+        await insertVertex('Book', { title, publicationYear });
+        await insertVertex('Genre', { name: genre });
+        await insertVertex('Series', { name: series });
+        await insertVertex('AgeGroup', { ageGroup });
 
-        const bookVertex = await findOrCreateVertex('Book', 'title', title);
-
-        const genreVertex = await findOrCreateVertex('Genre', 'name', genre);
-
-        const seriesVertex = await findOrCreateVertex('Series', 'name', series);
-
-        const ageGroupVertex = await findOrCreateVertex('AgeGroup', 'ageGroup', ageGroup);
-
-        await graph.V(authorVertex.value.id).as('a')
-            .V(bookVertex.value.id).as('b')
-            .addE('wrote').from_('a').to('b').next();
-
-        await graph.V(bookVertex.value.id).as('b')
-            .V(genreVertex.value.id).as('g')
-            .addE('belongs-to').from_('b').to('g').next();
-
-        await graph.V(bookVertex.value.id).as('b')
-            .V(seriesVertex.value.id).as('s')
-            .addE('part-of').from_('b').to('s').next();
-
-        await graph.V(bookVertex.value.id).as('b')
-            .V(ageGroupVertex.value.id).as('ag')
-            .addE('suitable-for').from_('b').to('ag').next();
+        await insertEdge('Author', 'fullName', authorName, 'Book', 'title', title, 'wrote');
+        await insertEdge('Book', 'title', title, 'Genre', 'name', genre, 'belongs-to');
+        await insertEdge('Book', 'title', title, 'Series', 'name', series, 'part-of');
+        await insertEdge('Book', 'title', title, 'AgeGroup', 'ageGroup', ageGroup, 'suitable-for');
 
         console.log(`Book "${title}" added successfully with details.`);
         
-        await driverConnection.close();
-
         return {
             statusCode: 200,
             body: JSON.stringify({ message: `Book "${title}" added successfully` }),
         };
     } catch (e) {
-        await driverConnection.close();
         console.log(e);
         return {
             statusCode: 500,
