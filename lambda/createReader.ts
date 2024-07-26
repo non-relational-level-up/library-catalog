@@ -7,10 +7,10 @@ export const handler: APIGatewayProxyHandler = async (event) => {
     const statics = gremlin.process.statics;
 
     try {
-        const readerId = event.pathParameters?.userId;
-        const books = await graph.V(readerId).out().hasLabel('Book').out().hasLabel('Genre').in_().hasLabel('Book').where(statics.not(statics.in_("has-read").hasId(readerId))).dedup().limit(3).values('title').toList();
+        const { readerName } = JSON.parse(event.body || '{}');
+        const reader = await graph.addV('Reader').property('name', readerName).next();
         await driverConnection.close();
-        const output = { suggestions: books}
+        const output = { reader: reader }
         console.log(output);
         return {
             statusCode: 200,
